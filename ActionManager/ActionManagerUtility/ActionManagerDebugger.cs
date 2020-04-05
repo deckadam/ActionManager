@@ -1,87 +1,107 @@
-﻿using System.Diagnostics;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using Debug = UnityEngine.Debug;
 
 namespace DeckAdam.ActionManager
 {
 	public static class ActionManagerDebugger
 	{
-		private static StringBuilder _completeDebug = new StringBuilder();
-		private static StackTrace _stackTrace = new StackTrace(true);
-		private const string Tab = "   ";
-		private const string DentedLine = "-----------------------------------------------------------------";
-
 		[Conditional("UNITY_ASSERTIONS")]
 		internal static void OnActionManagerInitialized()
 		{
-			AppendLine("Action manager initialized from : ");
-			AppendParagraphEnding();
-			Debug.Log(_completeDebug);
+			_logs.Clear();
+			Identifiers.Clear();
+			CreateNewLog("Action manager initialized from", LogType.OnActionManagerInitialized);
+			ActionManagerEditor.Instance?.Initialize();
 		}
 
 		[Conditional("UNITY_ASSERTIONS")]
 		internal static void OnClearListeners()
 		{
-			AppendLine("All listeners cleared");
-			AppendParagraphEnding();
-			Debug.Log(_completeDebug);
+			CollectIdentifiers();
+			CreateNewLog("All subscribers cleared", LogType.OnClearListeners);
 		}
 
 		[Conditional("UNITY_ASSERTIONS")]
 		internal static void OnRemoveListener(long id, string name)
 		{
-			AppendLine("Listener removed with id (" + id + ") from");
-			AppendParagraphEnding();
-			Debug.Log(_completeDebug);
+			CollectIdentifiers();
+			CreateNewLog("Subscriber removed with id (" + id + ") from with name (" + name + ")", LogType.OnRemoveListener);
 		}
 
 		[Conditional("UNITY_ASSERTIONS")]
 		internal static void OnActionAdded(long id)
 		{
-			AppendLine("Action subscribed with id (" + id + ")  from");
-			AppendParagraphEnding();
-			Debug.Log(_completeDebug);
+			CollectIdentifiers();
+			CreateNewLog("Subscribed to event with id (" + id + ")  from", LogType.OnActionAdded);
 		}
 
 		[Conditional("UNITY_ASSERTIONS")]
-		internal static void OnClearListener()
+		internal static void OnClearListener(long id)
 		{
-			AppendLine("Event listeners cleared");
-			AppendParagraphEnding();
-			Debug.Log(_completeDebug);
+			CollectIdentifiers();
+			CreateNewLog("Event listeners cleared with id (" + id + ")", LogType.OnClearListener);
 		}
 
 		[Conditional("UNITY_ASSERTIONS")]
 		internal static void OnTriggerAction(long id)
 		{
-			AppendLine("Event raised with id (" + id + ")");
-			AppendParagraphEnding();
-			Debug.Log(_completeDebug);
+			CreateNewLog("Event raised with id (" + id + ")", LogType.OnTriggerAction);
 		}
 
-		private static void AppendParagraphEnding()
+#if UNITY_ASSERTIONS
+
+		private const string Tab = "   ";
+		internal static Dictionary<long, string> Identifiers = new Dictionary<long, string>();
+		internal static Dictionary<long,List<string>> ConnectedListeners = new Dictionary<long, List<string>>();
+		private static List<ActionManagerLog> _logs = new List<ActionManagerLog>();
+
+		private static void AppendParagraph(string param, out string result)
 		{
-			_completeDebug.AppendLine(CollectStackTrace().ToString());
-			_completeDebug.AppendLine(DentedLine);
+			param += "\n" + CollectStackTrace();
+			result = param;
 		}
 
-		private static void AppendLine(string text)
+		private static void CreateNewLog(string log, LogType logType)
 		{
-			_completeDebug.AppendLine(text);
+			AppendParagraph(log, out var result);
+			_logs.Add(new ActionManagerLog(logType, result));
+
+			if (ActionManagerEditor.Instance != null)
+			{
+				ActionManagerEditor.Instance.RefreshTabs();
+			}
+			else Debug.Log("Listener not found");
 		}
 
-		private static StringBuilder CollectStackTrace()
+		// TODO: Optimize this part (Probably there is better ways to do this)
+		private static string CollectStackTrace()
 		{
-			var allTrace = new StringBuilder();
-			var count = _stackTrace.FrameCount;
+			var allTrace = "";
+			var stackTrace = new StackTrace(true);
+			var count = stackTrace.FrameCount;
 
 			for (var i = 1; i < count; i++)
 			{
-				var frame = _stackTrace.GetFrame(i);
-				allTrace.AppendLine(frame.GetFileName() + Tab + frame.GetMethod().Name + Tab + frame.GetFileLineNumber());
+				var frame = stackTrace.GetFrame(i);
+				allTrace += frame.GetFileName() + Tab + frame.GetMethod().Name + Tab + frame.GetFileLineNumber() + "\n";
 			}
 
 			return allTrace;
 		}
+
+		private static void CollectIdentifiers()
+		{
+			var properties = ActionManager.EventClass.GetFields();
+			foreach (var prop in properties)
+			{
+				var value = (long) prop.GetValue(null);
+				if (!Identifiers.ContainsKey(value))
+					Identifiers[value] = prop.Name;
+			}
+		}
+
+		internal static List<ActionManagerLog> GetLogs() => _logs;
+#endif
 	}
 }

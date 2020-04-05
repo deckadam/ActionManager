@@ -1,132 +1,164 @@
 using System;
 using System.Collections.Generic;
+using DeckAdam.ActionManager;
 using JetBrains.Annotations;
+using UnityEngine;
 
 namespace DeckAdam.ActionManager
 {
 	// TODO: Add debugging option
-	// TODO: Make debugging mode preprocessor directive based with #define to remove the overhead
 	// TODO: Add editor mode debugging for switchable debug mode
 	// TODO: Make debugging window for editor
 	public static class ActionManager
 	{
-		// Call the Init function on scene load initializing the action manager for avoiding the deprecated listeners
-		// from old scenes to avoid null reference calls
-		public static void Init()
+		internal static float InitializationTime;
+
+		// Dictionary for holding all events in order
+		private static Dictionary<long, EventHolder> _eventListeners;
+		internal static Type EventClass;
+
+		// Index holder for trigger parameter
+		private static long _lastEventId = long.MinValue;
+
+		/// <summary>
+		///     Getter for assigning unique event identifiers
+		/// </summary>
+		public static long NextTriggerId => ++_lastEventId;
+
+		/// <summary>
+		///     Call the Init function on scene load initializing the action manager for avoiding the destroyed listeners
+		///     from old scenes to avoid null reference calls
+		/// </summary>
+		/// <param name="eventClass">
+		///		Pass the typeof your event id holder class for tracking
+		/// </param>
+		public static void Init(Type eventClass)
 		{
-			_actionListeners = new Dictionary<long, ListenerObject>();
+			_eventListeners = new Dictionary<long, EventHolder>();
+			InitializationTime = Time.time;
+			EventClass = eventClass;
 			ActionManagerDebugger.OnActionManagerInitialized();
 		}
 
 
-		// Index holder for trigger parameter
-		private static long _lastTriggerIndex = long.MinValue;
-
-		// Getter method to be assign a unique value to each listener
-		public static long NextTriggerIndex => ++_lastTriggerIndex;
-
-		// Dictionary for holding all events in order
-		private static Dictionary<long, ListenerObject> _actionListeners;
-
 		/// <summary>
-		/// Clear all listeners to reset all event listeners
+		///     Clear all listeners to reset all event listeners
 		/// </summary>
 		public static void ClearListeners()
 		{
-			_actionListeners.Clear();
+			_eventListeners.Clear();
 			ActionManagerDebugger.OnClearListeners();
 		}
 
 		/// <summary>
-		/// Remove a specific listener method 
-		/// </summary>
-		/// <param name="triggerIndex">
-		/// Trigger to be removed
-		/// </param>
-		/// <param name="processToRemove">
-		/// Action to be removed
-		/// </param>
-		public static void RemoveListener(long triggerIndex, Action processToRemove)
-		{
-			if (_actionListeners.TryGetValue(triggerIndex, out var temp))
-				temp.RemoveListener(processToRemove);
-			ActionManagerDebugger.OnRemoveListener();
-		}
-
-		/// <summary>	
-		/// Add a listener to a event id
+		///     Remove a specific listener method
 		/// </summary>
 		/// <param name="id">
-		/// Event to be subscribed
+		///     Trigger to be removed
+		/// </param>
+		/// <param name="processToRemove">
+		///     Action to be removed
+		/// </param>
+		public static void RemoveListener(long id, Action processToRemove)
+		{
+			if (_eventListeners.TryGetValue(id, out var temp))
+				temp.RemoveListener(processToRemove);
+			ActionManagerDebugger.OnRemoveListener(id, processToRemove.Method.Name);
+		}
+
+		/// <summary>
+		///     Add a listener to a event id
+		/// </summary>
+		/// <param name="id">
+		///     Event to be subscribed
 		/// </param>
 		/// <param name="newAction">
-		/// Event to be triggered when event is raised
+		///     Event to be triggered when event is raised
 		/// </param>
 		public static void AddAction(long id, Action newAction)
 		{
-			IfKeyExistsDo(id, () => _actionListeners[id].AddListener(newAction), () =>
+			IfKeyExistsDo(id, () => _eventListeners[id].AddListener(newAction), () =>
 			{
-				_actionListeners[id] = new ListenerObject();
-				_actionListeners[id].AddListener(newAction);
+				_eventListeners[id] = new EventHolder();
+				_eventListeners[id].AddListener(newAction);
 			});
 			ActionManagerDebugger.OnActionAdded(id);
 		}
 
 
 		/// <summary>
-		/// Remove all listeners that listens to a specific event type
+		///     Remove all listeners that listens to a specific event type
 		/// </summary>
-		/// <param name="triggerIndex">
-		/// Event index to be cleared
+		/// <param name="id">
+		///     Event index to be cleared
 		/// </param>
-		public static void ClearListener(long triggerIndex)
+		public static void ClearListener(long id)
 		{
-			IfKeyExistsDo(triggerIndex, () => _actionListeners[triggerIndex].ClearListener());
-			ActionManagerDebugger.OnClearListener();
+			IfKeyExistsDo(id, () => _eventListeners[id].ClearListener());
+			ActionManagerDebugger.OnClearListener(id);
 		}
 
 		/// <summary>
-		/// Raise the events that listen for specified trigger index
+		///     Raise the events that listen for specified trigger index
 		/// </summary>
-		/// <param name="triggerIndex">
-		/// Specific index number to be raised
+		/// <param name="id">
+		///     Specific index number to be raised
 		/// </param>
-		public static void TriggerAction(long triggerIndex)
+		public static void TriggerAction(long id)
 		{
-			IfKeyExistsDo(triggerIndex, () => _actionListeners[triggerIndex].ProcessDelegates());
-			ActionManagerDebugger.OnTriggerAction(triggerIndex);
+			IfKeyExistsDo(id, () => _eventListeners[id].ProcessDelegates());
+			ActionManagerDebugger.OnTriggerAction(id);
 		}
 
 		// Is key has been created or not
-		private static bool IsKeyContained(long triggerIndex) => _actionListeners.ContainsKey(triggerIndex);
+		private static bool IsKeyContained(long id)
+		{
+			return _eventListeners.ContainsKey(id);
+		}
 
 		// For checking if the desired key has been assigned or not
-		private static void IfKeyExistsDo(long triggerIndex, Action ifToDo, Action elseToDo = null) => (IsKeyContained(triggerIndex) ? ifToDo : elseToDo)?.Invoke();
+		private static void IfKeyExistsDo(long id, Action ifToDo, Action elseToDo = null)
+		{
+			(IsKeyContained(id) ? ifToDo : elseToDo)?.Invoke();
+		}
+
+		#region Nested type: EventHolder
 
 		// Data holder class which works internally
-		private class ListenerObject
+		private class EventHolder
 		{
 			private Action _thisAction;
 
-			public void ProcessDelegates()
+			internal void ProcessDelegates()
 			{
 				_thisAction?.Invoke();
 			}
 
-			public void AddListener([NotNull] Action newAction)
+			internal void AddListener([NotNull] Action newAction)
 			{
 				_thisAction += newAction;
 			}
 
-			public void RemoveListener([NotNull] Action oldAction)
+			internal void RemoveListener([NotNull] Action oldAction)
 			{
 				_thisAction -= oldAction;
 			}
 
-			public void ClearListener()
+			internal void ClearListener()
 			{
 				_thisAction = null;
 			}
 		}
+
+		#endregion
 	}
+}
+
+// As a template on how to setup events class
+public partial class Events
+{
+	public static readonly long ActionManagerInitialized1 = ActionManager.NextTriggerId;
+	public static readonly long ActionManagerInitialized2 = ActionManager.NextTriggerId;
+	public static readonly long ActionManagerInitialized3 = ActionManager.NextTriggerId;
+	public static readonly long ActionManagerInitialized4 = ActionManager.NextTriggerId;
 }

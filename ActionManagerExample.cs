@@ -5,15 +5,15 @@ using UnityEngine;
 public class ActionManagerExample : MonoBehaviour
 {
 	// Start is called before the first frame update
-	void Start()
+	private void Start()
 	{
 		// Call this once for initializing action manager
 		// when recalled all subscribed events will be erased
-		ActionManager.Init();
-		
+		ActionManager.Init(typeof(Events));
+
 		//Subscribe to ActionManagerTestEvent with desired Action<> 
-		ActionManager.AddAction(TestEvents.ActionManagerTestEvent, TestMethod);
-		ActionManager.AddAction(TestEvents.ActionManagerExampleEvent,()=> Debug.Log("Never triggered event"));
+		ActionManager.AddAction(Events.ActionManagerTestEvent, TestMethod);
+		ActionManager.AddAction(Events.ActionManagerExampleEvent, () => Debug.Log("Never triggered event"));
 
 		// Start timed event for triggering event
 		StartCoroutine(TestTrigger());
@@ -30,22 +30,26 @@ public class ActionManagerExample : MonoBehaviour
 		yield return new WaitForSeconds(1f);
 		Debug.Log("Event triggered");
 		// Trigger event to run subscribed methods
-		ActionManager.TriggerAction(TestEvents.ActionManagerTestEvent);
-		ActionManager.RemoveListener(TestEvents.ActionManagerTestEvent,TestMethod);
+		ActionManager.TriggerAction(Events.ActionManagerTestEvent);
+		ActionManager.RemoveListener(Events.ActionManagerTestEvent, TestMethod);
+		ActionManager.ClearListeners();
 	}
 }
 
 // Define Globally reachable event id class
-public static partial class TestEvents
+public static partial class Events
 {
 	// Event id holder to be used through all codebase without coupling the listeners to each other
-	public static readonly long ActionManagerTestEvent = ActionManager.NextTriggerIndex;
+	public static readonly long ActionManagerTestEvent = ActionManager.NextTriggerId;
 }
+
+// For some debugger systems to work use this partial class naming as your event id creation
+// This method is strongly recommended for better debug features
 
 // Sample usage of partial event class for easier access
 // with this usage they came under same class name which saves us time from
 // searching through code base for event identifiers
-public static partial class TestEvents
+public partial class Events
 {
-	public static readonly long ActionManagerExampleEvent = ActionManager.NextTriggerIndex;
+	public static readonly long ActionManagerExampleEvent = ActionManager.NextTriggerId;
 }
