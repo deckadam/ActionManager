@@ -6,9 +6,6 @@ using UnityEngine;
 
 namespace DeckAdam.ActionManager
 {
-	// TODO: Add debugging option
-	// TODO: Add editor mode debugging for switchable debug mode
-	// TODO: Make debugging window for editor
 	public static class ActionManager
 	{
 		internal static float InitializationTime;
@@ -82,7 +79,7 @@ namespace DeckAdam.ActionManager
 				_eventListeners[id] = new EventHolder();
 				_eventListeners[id].AddListener(newAction);
 			});
-			ActionManagerDebugger.OnActionAdded(id);
+			ActionManagerDebugger.OnActionAdded(id,newAction.Method.Name);
 		}
 
 
@@ -152,13 +149,4 @@ namespace DeckAdam.ActionManager
 
 		#endregion
 	}
-}
-
-// As a template on how to setup events class
-public partial class Events
-{
-	public static readonly long ActionManagerInitialized1 = ActionManager.NextTriggerId;
-	public static readonly long ActionManagerInitialized2 = ActionManager.NextTriggerId;
-	public static readonly long ActionManagerInitialized3 = ActionManager.NextTriggerId;
-	public static readonly long ActionManagerInitialized4 = ActionManager.NextTriggerId;
 }

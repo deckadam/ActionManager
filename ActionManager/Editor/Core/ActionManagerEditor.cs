@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using JetBrains.Annotations;
+﻿using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -9,15 +6,10 @@ namespace DeckAdam.ActionManager
 {
 	public class ActionManagerEditor : EditorWindow
 	{
-		//TODO: Add identifiers tab
-		//TODO: Keep last selections
-		//TODO: Make window refresh on game start
-
-		private int _tabLayout;
-
-		private List<IActionContent> _contents;
-
 		internal static ActionManagerEditor Instance;
+		
+		private List<ActionContent> _contents;
+		private int _tabLayout;
 
 		[MenuItem("ActionManager/Debug options")]
 		private static void DebugOptions()
@@ -25,7 +17,6 @@ namespace DeckAdam.ActionManager
 			Instance = (ActionManagerEditor) GetWindow(typeof(ActionManagerEditor), false, "Action manager debugger");
 			Instance.Show();
 		}
-
 
 		internal void RefreshTabs()
 		{
@@ -37,7 +28,9 @@ namespace DeckAdam.ActionManager
 		{
 			_tabLayout = GUILayout.Toolbar(_tabLayout, new string[]
 			{
-				"Logs", "ID"
+				"Logs",
+				"Id",
+				"Settings"
 			});
 			if (_contents == null) Initialize();
 			_contents[_tabLayout].Display();
@@ -45,12 +38,12 @@ namespace DeckAdam.ActionManager
 
 		internal void Initialize()
 		{
-			Debug.Log("Re initialized");
 			Instance = this;
-			_contents = new List<IActionContent>()
+			_contents = new List<ActionContent>()
 			{
 				new LogContent(),
-				new IdContent()
+				new IdContent(),
+				new SettingsContent()
 			};
 		}
 	}

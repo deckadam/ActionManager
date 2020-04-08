@@ -1,57 +1,49 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using UnityEditor;
 using UnityEngine;
 
 namespace DeckAdam.ActionManager
 {
-	public class LogContent : IActionContent
+	public class LogContent : ActionContent
 	{
 		private Dictionary<string, bool> _logCondition = new Dictionary<string, bool>();
-		private StringBuilder _printedLogs;
+		private ScrollableTextArea _scrollableTextArea;
 
 		public LogContent()
 		{
 			var temp = Enum.GetValues(typeof(LogType));
 			foreach (var val in temp) _logCondition[val.ToString()] = true;
-			_printedLogs = new StringBuilder();
+			_scrollableTextArea = new ScrollableTextArea(Style.ScrollableTextAreaStyle);
 			Refresh();
 		}
 
-		public void Display()
+		public sealed override void Display()
 		{
 			EditorGUILayout.BeginHorizontal();
 			DrawLabels();
-			DrawTextArea();
+			_scrollableTextArea.Draw();
 			EditorGUILayout.EndHorizontal();
 		}
 
-		public void Refresh()
+		public sealed override void Refresh()
 		{
 			var allLogs = ActionManagerDebugger.GetLogs();
 
-			_printedLogs.Clear();
+			_scrollableTextArea.ClearContext();
 
 			foreach (var log in allLogs)
 				if (_logCondition[log.Type.ToString()])
-					_printedLogs.AppendLine(log + "\n");
+					_scrollableTextArea.AppendContext(log + "\n");
 		}
 
 		private void DrawLabels()
 		{
-			EditorGUILayout.BeginVertical();
-
+			EditorGUILayout.BeginVertical(GUILayout.MaxWidth(300));
 			var keys = new List<string>(_logCondition.Keys);
 			foreach (var enumValue in keys)
-				_logCondition[enumValue] = EditorGUILayout.Toggle(enumValue, _logCondition[enumValue],GUILayout.MinWidth(250),GUILayout.MaxWidth(250));
-
+				_logCondition[enumValue] = EditorGUILayout.Toggle(enumValue, _logCondition[enumValue], GUILayout.MinWidth(249), GUILayout.MaxWidth(250));
 			EditorGUILayout.EndVertical();
-		}
-
-		private void DrawTextArea()
-		{
-			EditorGUILayout.TextArea(_printedLogs.ToString(), GUILayout.MinHeight(999), GUILayout.MinWidth(999));
 		}
 	}
 }

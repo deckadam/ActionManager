@@ -11,8 +11,11 @@ public class ActionManagerExample : MonoBehaviour
 		// when recalled all subscribed events will be erased
 		ActionManager.Init(typeof(Events));
 
-		//Subscribe to ActionManagerTestEvent with desired Action<> 
+		// Subscribe to ActionManagerTestEvent with desired Action<> 
 		ActionManager.AddAction(Events.ActionManagerTestEvent, TestMethod);
+
+		// This method will be visible in ActionManagerDebugger window but because it is an anonymous method name won't be something understandable
+		// Because of that avoiding anonymous methods is advised
 		ActionManager.AddAction(Events.ActionManagerExampleEvent, () => Debug.Log("Never triggered event"));
 
 		// Start timed event for triggering event
@@ -32,7 +35,14 @@ public class ActionManagerExample : MonoBehaviour
 		// Trigger event to run subscribed methods
 		ActionManager.TriggerAction(Events.ActionManagerTestEvent);
 		ActionManager.RemoveListener(Events.ActionManagerTestEvent, TestMethod);
-		ActionManager.ClearListeners();
+
+		// You can see this action with its own name from ActionManagerDebugger window with clicking to ConnectedEventId button
+		ActionManager.AddAction(Events.ConnectedEventId, ConnectedMethodExample);
+	}
+
+	private void ConnectedMethodExample()
+	{
+		Debug.Log("This method will be visible in debugger window with");
 	}
 }
 
@@ -52,4 +62,5 @@ public static partial class Events
 public partial class Events
 {
 	public static readonly long ActionManagerExampleEvent = ActionManager.NextTriggerId;
+	public static readonly long ConnectedEventId = ActionManager.NextTriggerId;
 }
