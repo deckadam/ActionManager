@@ -4,13 +4,13 @@ using UnityEngine;
 
 namespace DeckAdam.ActionManager
 {
-	internal class ScrollableTextArea
+	internal class ActionScrollableTextArea
 	{
 		private StringBuilder _data;
 		private GUIStyle _style;
 		private Vector2 _scroll;
 
-		public ScrollableTextArea(GUIStyle style)
+		public ActionScrollableTextArea(GUIStyle style)
 		{
 			_data = new StringBuilder();
 			_scroll = Vector2.zero;
@@ -20,7 +20,7 @@ namespace DeckAdam.ActionManager
 		internal void Draw()
 		{
 			_scroll = EditorGUILayout.BeginScrollView(_scroll);
-			EditorGUILayout.TextArea(_data.ToString(), _style, GUILayout.ExpandHeight(true));
+			EditorGUILayout.TextArea(_data.ToString(), _style,GUILayout.ExpandHeight(true),GUILayout.ExpandWidth(true));
 			EditorGUILayout.EndScrollView();
 		}
 

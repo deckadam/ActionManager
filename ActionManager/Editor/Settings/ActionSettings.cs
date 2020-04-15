@@ -5,13 +5,18 @@ using UnityEngine;
 namespace DeckAdam.ActionManager
 {
 	[Serializable]
-	internal class Settings
+	internal class ActionSettings
 	{
-		private static readonly string SettingsPath = Application.dataPath + "/Settings.json";
-
+		internal static ActionSettings CurrentSettings;
 		public ActionTypeColorData[] data;
+		public int logRemoveIndex = 0;
 
-		private Settings()
+		static ActionSettings()
+		{
+			CurrentSettings = LoadSettings();
+		}
+
+		private ActionSettings()
 		{
 			var values = Enum.GetValues(typeof(LogType));
 			InitializeColors(values);
@@ -22,21 +27,21 @@ namespace DeckAdam.ActionManager
 			data = new ActionTypeColorData[values.Length];
 			foreach (var val in values)
 			{
-				data[val.GetHashCode()] = new ActionTypeColorData(val.ToString(), Color.blue);
+				data[val.GetHashCode()] = new ActionTypeColorData(val.ToString(), Color.black);
 			}
 		}
 
-		internal static Settings LoadSettings()
+		internal static ActionSettings LoadSettings()
 		{
-			if (!File.Exists(SettingsPath)) return new Settings();
-			var data = File.ReadAllText(SettingsPath);
-			return JsonUtility.FromJson<Settings>(data);
+			if (!File.Exists(ActionManagerConstants.DataPath)) return new ActionSettings();
+			var data = File.ReadAllText(ActionManagerConstants.DataPath);
+			return JsonUtility.FromJson<ActionSettings>(data);
 		}
 
-		internal static void SaveSettings(Settings value)
+		internal static void SaveSettings(ActionSettings value)
 		{
 			var data = JsonUtility.ToJson(value);
-			File.WriteAllText(SettingsPath, data.ToString());
+			File.WriteAllText(ActionManagerConstants.DataPath, data.ToString());
 		}
 	}
 

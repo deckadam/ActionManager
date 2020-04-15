@@ -14,6 +14,7 @@ namespace DeckAdam.ActionManager
 			Type = type;
 		}
 
+
 		internal LogType Type { get; }
 
 		public override string ToString()

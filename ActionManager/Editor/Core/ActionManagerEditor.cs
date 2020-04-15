@@ -1,49 +1,51 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using DeckAdam.ActionManager.UIComponent;
 using UnityEditor;
 using UnityEngine;
 
 namespace DeckAdam.ActionManager
 {
-	public class ActionManagerEditor : EditorWindow
+	internal class ActionManagerEditor : EditorWindow
 	{
 		internal static ActionManagerEditor Instance;
-		
 		private List<ActionContent> _contents;
+		private bool _isInitialized = false;
 		private int _tabLayout;
 
 		[MenuItem("ActionManager/Debug options")]
 		private static void DebugOptions()
 		{
-			Instance = (ActionManagerEditor) GetWindow(typeof(ActionManagerEditor), false, "Action manager debugger");
+			Instance = (ActionManagerEditor) GetWindow(typeof(ActionManagerEditor), false, ActionManagerConstants.Title);
 			Instance.Show();
 		}
 
 		internal void RefreshTabs()
 		{
-			if (_contents == null) Initialize();
-			_contents.ForEach((val) => val.Refresh());
+			_contents?.ForEach((val) => val.Refresh());
 		}
 
 		private void OnGUI()
 		{
+			if (!_isInitialized) Initialize();
 			_tabLayout = GUILayout.Toolbar(_tabLayout, new string[]
 			{
-				"Logs",
-				"Id",
-				"Settings"
+				_contents[0].ContentName,
+				_contents[1].ContentName,
+				_contents[2].ContentName
 			});
-			if (_contents == null) Initialize();
-			_contents[_tabLayout].Display();
+			_contents[_tabLayout].Display(this);
 		}
 
 		internal void Initialize()
 		{
+			_isInitialized = true;
 			Instance = this;
 			_contents = new List<ActionContent>()
 			{
-				new LogContent(),
-				new IdContent(),
-				new SettingsContent()
+				new ActionLogContent(),
+				new ActionIdContent(),
+				new ActionSettingsContent()
 			};
 		}
 	}

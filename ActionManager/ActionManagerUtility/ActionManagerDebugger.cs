@@ -9,14 +9,14 @@ namespace DeckAdam.ActionManager
 	{
 		//TODO: Colorized display to editor window, different color for different operations and changeable color option from settings menu
 		//TODO: Make txt file output option (Save button to editor window)
-		
+
 		[Conditional("UNITY_ASSERTIONS")]
 		internal static void OnActionManagerInitialized()
 		{
 			_logs.Clear();
 			Identifiers.Clear();
-			Identifiers.Add(long.MaxValue, "Clear");
-			CreateNewLog("Action manager initialized from", LogType.OnActionManagerInitialized);
+			Identifiers.Add(long.MaxValue, ActionManagerConstants.Clear);
+			CreateNewLog(ActionManagerLogCreator.GetActionManagerInitializedLog(), LogType.OnActionManagerInitialized);
 			ActionManagerEditor.Instance?.Initialize();
 		}
 
@@ -25,7 +25,7 @@ namespace DeckAdam.ActionManager
 		{
 			CollectIdentifiers();
 			ClearListenerConnections();
-			CreateNewLog("All subscribers cleared", LogType.OnClearListeners);
+			CreateNewLog(ActionManagerLogCreator.GetOnClearListenersLog(), LogType.OnClearListeners);
 		}
 
 		[Conditional("UNITY_ASSERTIONS")]
@@ -33,7 +33,7 @@ namespace DeckAdam.ActionManager
 		{
 			CollectIdentifiers();
 			SevereListenerConnection(id, name);
-			CreateNewLog("Subscriber removed with id (" + id + ") from with name (" + name + ")", LogType.OnRemoveListener);
+			CreateNewLog(ActionManagerLogCreator.GetOnRemoveListenerLog(id, name), LogType.OnRemoveListener);
 		}
 
 		[Conditional("UNITY_ASSERTIONS")]
@@ -41,7 +41,7 @@ namespace DeckAdam.ActionManager
 		{
 			CollectIdentifiers();
 			AddListenerConnection(id, name);
-			CreateNewLog("Subscribed to event with id (" + id + ") ," + "name (" + name + ")  from", LogType.OnActionAdded);
+			CreateNewLog(ActionManagerLogCreator.GetOnActionAddedLog(id, name), LogType.OnActionAdded);
 		}
 
 		[Conditional("UNITY_ASSERTIONS")]
@@ -49,25 +49,24 @@ namespace DeckAdam.ActionManager
 		{
 			CollectIdentifiers();
 			SevereIdConnection(id);
-			CreateNewLog("Event listeners cleared with id (" + id + ")", LogType.OnClearListener);
+			CreateNewLog(ActionManagerLogCreator.GetOnClearListenerLog(id), LogType.OnClearListener);
 		}
 
 		[Conditional("UNITY_ASSERTIONS")]
 		internal static void OnTriggerAction(long id)
 		{
-			CreateNewLog("Event raised with id (" + id + ")", LogType.OnTriggerAction);
+			CreateNewLog(ActionManagerLogCreator.GetOnTriggerActionLog(id), LogType.OnTriggerAction);
 		}
 
 #if UNITY_ASSERTIONS
 
-		private const string Tab = "   ";
 		internal static Dictionary<long, string> Identifiers = new Dictionary<long, string>();
 		internal static Dictionary<long, List<string>> ConnectedListeners = new Dictionary<long, List<string>>();
 		private static List<ActionManagerLog> _logs = new List<ActionManagerLog>();
 
 		private static void AppendParagraph(string param, out string result)
 		{
-			param += "\n" + CollectStackTrace();
+			param += ActionManagerConstants.NewLine + CollectStackTrace();
 			result = param;
 		}
 
@@ -75,7 +74,7 @@ namespace DeckAdam.ActionManager
 		{
 			AppendParagraph(log, out var result);
 			_logs.Add(new ActionManagerLog(logType, result));
-			
+
 			if (ActionManagerEditor.Instance == null) return;
 			ActionManagerEditor.Instance.RefreshTabs();
 		}
@@ -83,17 +82,36 @@ namespace DeckAdam.ActionManager
 		// TODO: Optimize this part (Probably there is better ways to do this)
 		private static string CollectStackTrace()
 		{
-			var allTrace = "";
+			var allTrace = ActionManagerConstants.EmptyString;
 			var stackTrace = new StackTrace(true);
 			var count = stackTrace.FrameCount;
 
 			for (var i = 0; i < count; i++)
 			{
 				var frame = stackTrace.GetFrame(i);
-				allTrace += frame.GetFileName() + Tab + frame.GetMethod().Name + Tab + frame.GetFileLineNumber() + "\n";
+				var newLog = frame.GetFileName() +
+				             ActionManagerConstants.DoubleSpace +
+				             frame.GetMethod().Name +
+				             ActionManagerConstants.DoubleSpace +
+				             frame.GetFileLineNumber();
+				newLog = GetCroppedLog(newLog);
+				allTrace += newLog + ActionManagerConstants.NewLine;
 			}
 
 			return allTrace;
+		}
+
+
+		private static string GetCroppedLog(string logToCrop)
+		{
+			var splittedText = logToCrop.Split(ActionManagerConstants.Divider);
+			var returnString = ActionManagerConstants.EmptyString;
+			for (var i = ActionSettings.CurrentSettings.logRemoveIndex; i < splittedText.Length; i++)
+			{
+				returnString += splittedText[i];
+			}
+
+			return returnString;
 		}
 
 		private static void CollectIdentifiers()

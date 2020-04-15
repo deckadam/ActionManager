@@ -1,14 +1,17 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEditor;
 
-public class ActionContent
+namespace DeckAdam.ActionManager.UIComponent
 {
-	public virtual void Display()
+	internal class ActionContent
 	{
-	}
+		internal virtual string ContentName => "Default name";
 
-	public virtual void Refresh()
-	{
+		internal virtual void Display(EditorWindow editor)
+		{
+		}
+
+		internal virtual void Refresh()
+		{
+		}
 	}
 }

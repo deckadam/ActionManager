@@ -1,20 +1,20 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using DeckAdam.ActionManager;
+using DeckAdam.ActionManager.UIComponent;
 using UnityEditor;
 using UnityEngine;
 
 namespace DeckAdam.ActionManager
 {
-	internal class SettingsContent : ActionContent
+	internal class ActionSettingsContent : ActionContent
 	{
-		internal static Settings CurrentSettings;
-		private Dictionary<string, int> _labelTable = new Dictionary<string, int>();
+		internal override string ContentName => "Settings";
 
-		internal SettingsContent()
+		private static ActionSettings _currentActionSettings;
+		private Dictionary<string, int> _labelTable = new Dictionary<string, int>();
+		private ActionButton _applyButton;
+
+		internal ActionSettingsContent()
 		{
 			var temp = Enum.GetValues(typeof(LogType));
 
@@ -24,10 +24,10 @@ namespace DeckAdam.ActionManager
 				_labelTable[val.ToString()] = counter++;
 			}
 
-			CurrentSettings = Settings.LoadSettings();
+			_applyButton = new ActionButton(ActionManagerConstants.Apply);
 		}
 
-		public sealed override void Display()
+		internal sealed override void Display(EditorWindow editor)
 		{
 			EditorGUILayout.BeginVertical();
 			DrawColorPickerWithLabel();
@@ -37,8 +37,8 @@ namespace DeckAdam.ActionManager
 
 		private void ApplyButton()
 		{
-			if (!GUILayout.Button("Apply")) return;
-			Settings.SaveSettings(CurrentSettings);
+			if (!_applyButton.DrawButton()) return;
+			ActionSettings.SaveSettings(ActionSettings.CurrentSettings);
 		}
 
 		private void DrawColorPickerWithLabel()
@@ -49,8 +49,8 @@ namespace DeckAdam.ActionManager
 			foreach (var label in keys)
 			{
 				EditorGUILayout.BeginHorizontal();
-				EditorGUILayout.LabelField(label,GUILayout.MinWidth(250),GUILayout.MaxWidth(250));
-				CurrentSettings.data[GetIndex(label)].SetColor(EditorGUILayout.ColorField(CurrentSettings.data[GetIndex(label)].GetColor()));
+				EditorGUILayout.LabelField(label, GUILayout.MinWidth(250), GUILayout.MaxWidth(250));
+				ActionSettings.CurrentSettings.data[GetIndex(label)].SetColor(EditorGUILayout.ColorField(ActionSettings.CurrentSettings.data[GetIndex(label)].GetColor()));
 				EditorGUILayout.EndHorizontal();
 			}
 
