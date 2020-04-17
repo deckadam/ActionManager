@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using DeckAdam.ActionManager.UIComponent;
 using UnityEditor;
 using UnityEngine;
 
@@ -11,24 +9,32 @@ namespace DeckAdam.ActionManager.UIComponent
 	{
 		internal override string ContentName => "Logs";
 
-		//TODO: Keys cache
 		//TODO: Cache key states
 		//TODO: Clear selection and select all buttons
-		private Dictionary<string, bool> _logCondition = new Dictionary<string, bool>();
-		private List<string> _keys;
-		private ActionScrollableTextArea _actionScrollableTextArea;
-		private ActionScrollBar _tagActionScrollBar;
 		private Dictionary<string, ActionToggle> _toggles = new Dictionary<string, ActionToggle>();
+		private Dictionary<string, bool> _logCondition = new Dictionary<string, bool>();
+		private ActionScrollableTextArea _actionScrollableTextArea;
+		private ActionVerticalArea _actionVerticalArea;
+		private ActionButton _deselectAllButton;
+		private ActionButton _selectAllButton;
+		private List<string> _keys;
 
 		internal ActionLogContent()
 		{
-			var temp = Enum.GetValues(typeof(LogType));
-			foreach (var val in temp) _logCondition[val.ToString()] = true;
+			foreach (var val in ActionRepo.GetLogTypes()) _logCondition[val.ToString()] = true;
+			
 			_actionScrollableTextArea = new ActionScrollableTextArea(ActionStyle.ScrollableTextAreaStyle);
-			_tagActionScrollBar = new ActionScrollBar();
+			
+			var scrollBar = new ActionScrollBar();
+			_actionVerticalArea = new ActionVerticalArea(scrollBar.BeginScrollView, scrollBar.EndScrollView);
+			
 			Refresh();
+			
 			_keys = new List<string>(_logCondition.Keys);
 			foreach (var val in _keys) _toggles[val] = new ActionToggle();
+			
+			_selectAllButton = new ActionButton(ActionManagerConstants.SelectAll);
+			_deselectAllButton = new ActionButton(ActionManagerConstants.DeselectAll);
 		}
 
 		internal sealed override void Display(EditorWindow editor)
@@ -39,9 +45,7 @@ namespace DeckAdam.ActionManager.UIComponent
 
 		private void DrawTags(EditorWindow editor)
 		{
-			GUILayout.BeginArea(new Rect(5, 25, 200, editor.position.height - 5));
-			EditorGUILayout.BeginVertical();
-			_tagActionScrollBar.BeginScrollView();
+			_actionVerticalArea.BeginVerticalArea(0, 30, 200, (int) editor.position.height - 10);
 
 			foreach (var enumValue in _keys)
 			{
@@ -50,9 +54,10 @@ namespace DeckAdam.ActionManager.UIComponent
 				if (temp != _logCondition[enumValue]) Refresh();
 			}
 
-			_tagActionScrollBar.EndScrollView();
-			EditorGUILayout.EndVertical();
-			GUILayout.EndArea();
+			if (_selectAllButton.DrawButton()) SetAllKeys(true);
+			if (_deselectAllButton.DrawButton()) SetAllKeys(false);
+
+			_actionVerticalArea.EndVerticalArea();
 		}
 
 		private void DrawTextArea(EditorWindow editor)
@@ -64,12 +69,20 @@ namespace DeckAdam.ActionManager.UIComponent
 
 		internal sealed override void Refresh()
 		{
-			var allLogs = ActionManagerDebugger.GetLogs();
+			var allLogs = ActionRepo.GetLogs();
 
 			_actionScrollableTextArea.ClearContext();
 
 			foreach (var log in allLogs.Where(log => _logCondition[log.Type.ToString()]))
 				_actionScrollableTextArea.AppendContext(log + ActionManagerConstants.NewLine);
+		}
+
+		private void SetAllKeys(bool value)
+		{
+			foreach (var enumValue in _toggles.Keys)
+				_toggles[enumValue].SetToggleStatus(value);
+
+			Refresh();
 		}
 	}
 }

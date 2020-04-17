@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
-using UnityEngine;
+﻿using UnityEditor;
 
 namespace DeckAdam.ActionManager.UIComponent
 {
@@ -13,6 +10,11 @@ namespace DeckAdam.ActionManager.UIComponent
 		{
 			_value = EditorGUILayout.Toggle(param, _value);
 			return _value;
+		}
+
+		internal void SetToggleStatus(bool value)
+		{
+			_value = value;
 		}
 	}
 }

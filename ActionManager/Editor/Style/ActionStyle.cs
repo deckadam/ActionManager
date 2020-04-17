@@ -9,12 +9,10 @@ namespace DeckAdam.ActionManager
 		internal static readonly GUIStyle ScrollableTextAreaStyle= new GUIStyle(GUI.skin.textArea)
 		{
 			wordWrap = false,
-			stretchWidth = true
+			stretchWidth = true,
+			stretchHeight = true
 		};
-		internal static readonly GUIStyle  ToggleStyle = new GUIStyle(GUI.skin.toggle)
-		{
-			fixedWidth = 290
-		};
+
 		internal static readonly  GUIStyle ButtonStyle = new GUIStyle(GUI.skin.button)
 		{
 			padding = new RectOffset(5,5,5,5),

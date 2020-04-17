@@ -14,15 +14,14 @@ namespace DeckAdam.ActionManager
 		internal readonly static string Title = "Action manager debugger";
 		internal readonly static string DataPath = Application.dataPath + "/Settings.json";
 		internal readonly static string EmptyString = "";
-		internal readonly static string Clear = "Clear";
 		internal readonly static char Divider = '\\';
 		internal readonly static char OpenParanthesis = '(';
 		internal readonly static char CloseParanthesis = ')';
-
+		internal readonly static string SelectAll = "Select all";
+		internal readonly static string DeselectAll = "Deselect all";
 
 		#region Debug templates
-		
-		
+
 		#endregion
 	}
 }

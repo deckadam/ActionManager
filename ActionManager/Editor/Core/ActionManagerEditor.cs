@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using DeckAdam.ActionManager.UIComponent;
 using UnityEditor;
-using UnityEngine;
 
 namespace DeckAdam.ActionManager
 {
 	internal class ActionManagerEditor : EditorWindow
 	{
 		internal static ActionManagerEditor Instance;
+		private ActionToolBar _actionToolBar;
 		private List<ActionContent> _contents;
-		private bool _isInitialized = false;
 		private int _tabLayout;
 
 		[MenuItem("ActionManager/Debug options")]
@@ -27,19 +25,13 @@ namespace DeckAdam.ActionManager
 
 		private void OnGUI()
 		{
-			if (!_isInitialized) Initialize();
-			_tabLayout = GUILayout.Toolbar(_tabLayout, new string[]
-			{
-				_contents[0].ContentName,
-				_contents[1].ContentName,
-				_contents[2].ContentName
-			});
-			_contents[_tabLayout].Display(this);
+			if (_contents == null) Initialize();
+			var result = _actionToolBar.DrawToolbar();
+			_contents[result].Display(this);
 		}
 
-		internal void Initialize()
+		private void Initialize()
 		{
-			_isInitialized = true;
 			Instance = this;
 			_contents = new List<ActionContent>()
 			{
@@ -47,6 +39,13 @@ namespace DeckAdam.ActionManager
 				new ActionIdContent(),
 				new ActionSettingsContent()
 			};
+
+			_actionToolBar = new ActionToolBar(new string[]
+			{
+				_contents[0].ContentName,
+				_contents[1].ContentName,
+				_contents[2].ContentName
+			});
 		}
 	}
 }

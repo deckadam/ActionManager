@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using DeckAdam.ActionManager.UIComponent;
 using UnityEditor;
 using UnityEngine;
@@ -9,21 +10,17 @@ namespace DeckAdam.ActionManager
 	{
 		internal override string ContentName => "Identifiers";
 
-		private Dictionary<long, string> _identifiers;
 		private ActionScrollableTextArea _actionScrollableTextArea;
+		private ActionVerticalArea _verticalTagArea;
+		private List<ActionButton> _idButtons;
+
 		private long _lastSelectedLabel = long.MaxValue;
-		private ActionScrollBar _tagActionScrollBar;
 
 		internal ActionIdContent()
 		{
 			_actionScrollableTextArea = new ActionScrollableTextArea(ActionStyle.ScrollableTextAreaStyle);
-			_tagActionScrollBar = new ActionScrollBar();
-			Refresh();
-		}
-
-		internal sealed override void Refresh()
-		{
-			_identifiers = ActionManagerDebugger.Identifiers;
+			var scrollBar = new ActionScrollBar();
+			_verticalTagArea = new ActionVerticalArea(scrollBar.BeginScrollView, scrollBar.EndScrollView);
 			GetSelectedIdListeners();
 		}
 
@@ -33,22 +30,18 @@ namespace DeckAdam.ActionManager
 			DrawTextArea(editor);
 		}
 
+		//TODO: Make this buttons object
 		private void DrawTags(EditorWindow editor)
 		{
-			GUILayout.BeginArea(new Rect(5, 25, 190, editor.position.height - 5));
-			EditorGUILayout.BeginVertical();
-			_tagActionScrollBar.BeginScrollView();
-
-			foreach (var label in _identifiers.Keys)
+			_verticalTagArea.BeginVerticalArea(0, 30, 200, (int) editor.position.height - 10);
+			foreach (var label in ActionRepo.GetIdentifiers().Keys)
 			{
-				if (!GUILayout.Button(_identifiers[label])) continue;
+				if (!GUILayout.Button(ActionRepo.GetIdentifierName(label), ActionStyle.ButtonStyle)) continue;
 				_lastSelectedLabel = label;
 				GetSelectedIdListeners();
 			}
 
-			_tagActionScrollBar.EndScrollView();
-			EditorGUILayout.EndVertical();
-			GUILayout.EndArea();
+			_verticalTagArea.EndVerticalArea();
 		}
 
 		private void DrawTextArea(EditorWindow editor)
@@ -60,19 +53,13 @@ namespace DeckAdam.ActionManager
 
 		private void GetSelectedIdListeners()
 		{
-			if (!ActionManagerDebugger.ConnectedListeners.ContainsKey(_lastSelectedLabel))
+			if (!ActionRepo.IsListenerConnectedWithId(_lastSelectedLabel))
 			{
 				_actionScrollableTextArea.ClearContext();
 				return;
 			}
 
-			var connections = ActionManagerDebugger.ConnectedListeners[_lastSelectedLabel];
-
-			if (connections.Count == 0)
-			{
-				_actionScrollableTextArea.SetContext("No active connection");
-				return;
-			}
+			var connections = ActionRepo.GetConnectedListenersWithId(_lastSelectedLabel);
 
 			_actionScrollableTextArea.ClearContext();
 			foreach (var connection in connections)

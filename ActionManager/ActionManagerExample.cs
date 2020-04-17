@@ -17,6 +17,9 @@ public class ActionManagerExample : MonoBehaviour
 		// This method will be visible in ActionManagerDebugger window but because it is an anonymous method name won't be something understandable
 		// Because of that avoiding anonymous methods is advised
 		ActionManager.AddAction(Events.ActionManagerExampleEvent, () => Debug.Log("Never triggered event"));
+		ActionManager.AddAction(Events.ActionManagerExampleEvent, () => Debug.Log("Never triggered event"));
+		ActionManager.AddAction(Events.ActionManagerExampleEvent, () => Debug.Log("Never triggered event"));
+		// This anonymous event submissions will be visible in debugger window separately
 
 		// Start timed event for triggering event
 		StartCoroutine(TestTrigger());
