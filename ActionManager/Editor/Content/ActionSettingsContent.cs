@@ -28,19 +28,13 @@ namespace DeckAdam.ActionManager
 				_colorPickers[val] = new ActionColorFieldWithLabel(val, ActionSettings.CurrentSettings.data[GetIndex(val)].GetColor());
 			}
 
-			_applyButton = new ActionButton(ActionManagerConstants.Apply);
+			_applyButton = new ActionButton(ActionManagerConstants.Apply,ActionSettings.SaveSettings);
 		}
 
 		internal sealed override void Display(EditorWindow editor)
 		{
 			DrawColorPickerWithLabel();
-			ApplyButton();
-		}
-
-		private void ApplyButton()
-		{
-			if (!_applyButton.DrawButton()) return;
-			ActionSettings.SaveSettings(ActionSettings.CurrentSettings);
+			_applyButton.ProcessButton();
 		}
 
 		private void DrawColorPickerWithLabel()
@@ -48,7 +42,8 @@ namespace DeckAdam.ActionManager
 			foreach (var label in _keys)
 			{
 				var result = _colorPickers[label].DrawColorField();
-				ActionSettings.CurrentSettings.data[GetIndex(label)].SetColor(result);
+				var index = GetIndex(label);
+				ActionSettings.CurrentSettings.data[index].SetColor(result);
 			}
 		}
 

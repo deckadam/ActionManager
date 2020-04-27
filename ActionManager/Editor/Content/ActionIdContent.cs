@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using DeckAdam.ActionManager.UIComponent;
 using UnityEditor;
 using UnityEngine;
@@ -14,14 +13,14 @@ namespace DeckAdam.ActionManager
 		private ActionVerticalArea _verticalTagArea;
 		private List<ActionButton> _idButtons;
 
-		private long _lastSelectedLabel = long.MaxValue;
-
 		internal ActionIdContent()
 		{
 			_actionScrollableTextArea = new ActionScrollableTextArea(ActionStyle.ScrollableTextAreaStyle);
 			var scrollBar = new ActionScrollBar();
 			_verticalTagArea = new ActionVerticalArea(scrollBar.BeginScrollView, scrollBar.EndScrollView);
-			GetSelectedIdListeners();
+			GetSelectedIdListeners(long.MinValue);
+			_idButtons = new List<ActionButton>();
+			ActionRepo.OnIdentifiersUpdated += AdjustTagButtons;
 		}
 
 		internal sealed override void Display(EditorWindow editor)
@@ -30,16 +29,12 @@ namespace DeckAdam.ActionManager
 			DrawTextArea(editor);
 		}
 
-		//TODO: Make this buttons object
 		private void DrawTags(EditorWindow editor)
 		{
 			_verticalTagArea.BeginVerticalArea(0, 30, 200, (int) editor.position.height - 10);
-			foreach (var label in ActionRepo.GetIdentifiers().Keys)
-			{
-				if (!GUILayout.Button(ActionRepo.GetIdentifierName(label), ActionStyle.ButtonStyle)) continue;
-				_lastSelectedLabel = label;
-				GetSelectedIdListeners();
-			}
+
+			foreach (var label in _idButtons)
+				label.ProcessButton();
 
 			_verticalTagArea.EndVerticalArea();
 		}
@@ -51,20 +46,25 @@ namespace DeckAdam.ActionManager
 			GUILayout.EndArea();
 		}
 
-		private void GetSelectedIdListeners()
+		private void GetSelectedIdListeners(long id)
 		{
-			if (!ActionRepo.IsListenerConnectedWithId(_lastSelectedLabel))
-			{
-				_actionScrollableTextArea.ClearContext();
-				return;
-			}
-
-			var connections = ActionRepo.GetConnectedListenersWithId(_lastSelectedLabel);
-
 			_actionScrollableTextArea.ClearContext();
+
+			if (!ActionRepo.IsListenerConnectedWithId(id)) return;
+
+			var connections = ActionRepo.GetConnectedListenersWithId(id);
+
 			foreach (var connection in connections)
-			{
 				_actionScrollableTextArea.AppendContext(connection);
+		}
+
+		private void AdjustTagButtons()
+		{
+			_idButtons.Clear();
+
+			foreach (var label in ActionRepo.GetIdentifiers().Keys)
+			{
+				_idButtons.Add(new ActionButton(ActionRepo.GetIdentifierName(label), () => GetSelectedIdListeners(label)));
 			}
 		}
 	}

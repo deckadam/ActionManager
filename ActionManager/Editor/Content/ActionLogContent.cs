@@ -21,20 +21,21 @@ namespace DeckAdam.ActionManager.UIComponent
 
 		internal ActionLogContent()
 		{
+			Debug.Log(ActionRepo.GetLogTypes() == null);
 			foreach (var val in ActionRepo.GetLogTypes()) _logCondition[val.ToString()] = true;
-			
+
 			_actionScrollableTextArea = new ActionScrollableTextArea(ActionStyle.ScrollableTextAreaStyle);
-			
+
 			var scrollBar = new ActionScrollBar();
 			_actionVerticalArea = new ActionVerticalArea(scrollBar.BeginScrollView, scrollBar.EndScrollView);
-			
+
 			Refresh();
-			
+
 			_keys = new List<string>(_logCondition.Keys);
 			foreach (var val in _keys) _toggles[val] = new ActionToggle();
-			
-			_selectAllButton = new ActionButton(ActionManagerConstants.SelectAll);
-			_deselectAllButton = new ActionButton(ActionManagerConstants.DeselectAll);
+
+			_selectAllButton = new ActionButton(ActionManagerConstants.SelectAll, () => SetAllKeys(true));
+			_deselectAllButton = new ActionButton(ActionManagerConstants.DeselectAll, () => SetAllKeys(false));
 		}
 
 		internal sealed override void Display(EditorWindow editor)
@@ -53,10 +54,8 @@ namespace DeckAdam.ActionManager.UIComponent
 				_logCondition[enumValue] = _toggles[enumValue].DrawToggle(enumValue);
 				if (temp != _logCondition[enumValue]) Refresh();
 			}
-
-			if (_selectAllButton.DrawButton()) SetAllKeys(true);
-			if (_deselectAllButton.DrawButton()) SetAllKeys(false);
-
+			_selectAllButton.ProcessButton();
+			_deselectAllButton.ProcessButton();
 			_actionVerticalArea.EndVerticalArea();
 		}
 

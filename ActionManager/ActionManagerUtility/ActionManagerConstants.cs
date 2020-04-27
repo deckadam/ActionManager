@@ -13,6 +13,7 @@ namespace DeckAdam.ActionManager
 		internal readonly static string Apply = "Apply";
 		internal readonly static string Title = "Action manager debugger";
 		internal readonly static string DataPath = Application.dataPath + "/Settings.json";
+		internal readonly static string IdentifierFilePath = Application.dataPath + "IdentifierState.json";
 		internal readonly static string EmptyString = "";
 		internal readonly static char Divider = '\\';
 		internal readonly static char OpenParanthesis = '(';

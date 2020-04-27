@@ -10,10 +10,10 @@ namespace DeckAdam.ActionManager
 		[Conditional("UNITY_ASSERTIONS")]
 		internal static void OnActionManagerInitialized()
 		{
-			ActionRepo.InitializeRepo();
 			CreateNewLog(ActionManagerLogCreator.GetActionManagerInitializedLog(), LogType.OnActionManagerInitialized);
 		}
-
+		
+		// TODO: Collect identifiers optimize
 		[Conditional("UNITY_ASSERTIONS")]
 		internal static void OnClearListeners()
 		{

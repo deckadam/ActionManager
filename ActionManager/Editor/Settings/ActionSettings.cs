@@ -16,7 +16,7 @@ namespace DeckAdam.ActionManager
 			CurrentSettings = LoadSettings();
 		}
 
-		private ActionSettings()
+		public ActionSettings()
 		{
 			var values = Enum.GetValues(typeof(LogType));
 			InitializeColors(values);
@@ -33,15 +33,12 @@ namespace DeckAdam.ActionManager
 
 		internal static ActionSettings LoadSettings()
 		{
-			if (!File.Exists(ActionManagerConstants.DataPath)) return new ActionSettings();
-			var data = File.ReadAllText(ActionManagerConstants.DataPath);
-			return JsonUtility.FromJson<ActionSettings>(data);
+			return ActionManagerJSONLoader.LoadData<ActionSettings>(ActionManagerConstants.DataPath);
 		}
 
-		internal static void SaveSettings(ActionSettings value)
+		internal static void SaveSettings()
 		{
-			var data = JsonUtility.ToJson(value);
-			File.WriteAllText(ActionManagerConstants.DataPath, data.ToString());
+			ActionManagerJSONLoader.SaveData(CurrentSettings);
 		}
 	}
 
