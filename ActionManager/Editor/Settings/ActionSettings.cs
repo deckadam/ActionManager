@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using UnityEngine;
 
 namespace DeckAdam.ActionManager
@@ -33,12 +32,12 @@ namespace DeckAdam.ActionManager
 
 		internal static ActionSettings LoadSettings()
 		{
-			return ActionManagerJSONLoader.LoadData<ActionSettings>(ActionManagerConstants.DataPath);
+			return ActionManagerJSONLoader.LoadData<ActionSettings>(ActionManagerConstants.SettingsFilePath);
 		}
 
 		internal static void SaveSettings()
 		{
-			ActionManagerJSONLoader.SaveData(CurrentSettings);
+			ActionManagerJSONLoader.SaveData(CurrentSettings, ActionManagerConstants.SettingsFilePath);
 		}
 	}
 

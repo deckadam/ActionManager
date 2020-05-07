@@ -5,17 +5,17 @@ namespace DeckAdam.ActionManager
 {
 	internal class ActionManagerJSONLoader
 	{
-		internal static T LoadData<T>(string dataPath) where T : new()
+		internal static T LoadData<T>(string filePath) where T : new()
 		{
-			if (!File.Exists(dataPath)) return new T();
-			var data = File.ReadAllText(ActionManagerConstants.DataPath);
+			if (!File.Exists(filePath)) return new T();
+			var data = File.ReadAllText(filePath);
 			return JsonUtility.FromJson<T>(data);
 		}
 
-		internal static void SaveData<T>(T objectToSave)
+		internal static void SaveData<T>(T objectToSave, string filePath)
 		{
-			var data = JsonUtility.ToJson(objectToSave);
-			File.WriteAllText(ActionManagerConstants.DataPath, data);
+			var data = JsonUtility.ToJson(objectToSave, true);
+			File.WriteAllText(filePath, data);
 		}
 	}
 }

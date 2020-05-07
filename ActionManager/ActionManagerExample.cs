@@ -23,6 +23,7 @@ public class ActionManagerExample : MonoBehaviour
 
 		// Start timed event for triggering event
 		StartCoroutine(TestTrigger());
+		
 	}
 
 	private void TestMethod()
@@ -41,6 +42,8 @@ public class ActionManagerExample : MonoBehaviour
 
 		// You can see this action with its own name from ActionManagerDebugger window with clicking to ConnectedEventId button
 		ActionManager.AddAction(Events.ConnectedEventId, ConnectedMethodExample);
+		ActionManager.SaveIdentifierStatus();
+
 	}
 
 	private void ConnectedMethodExample()

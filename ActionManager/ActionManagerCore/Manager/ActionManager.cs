@@ -79,7 +79,7 @@ namespace DeckAdam.ActionManager
 				_eventListeners[id] = new EventHolder();
 				_eventListeners[id].AddListener(newAction);
 			});
-			ActionManagerDebugger.OnActionAdded(id,newAction.Method.Name);
+			ActionManagerDebugger.OnActionAdded(id, newAction.Method.Name);
 		}
 
 
@@ -105,6 +105,14 @@ namespace DeckAdam.ActionManager
 		{
 			IfKeyExistsDo(id, () => _eventListeners[id].ProcessDelegates());
 			ActionManagerDebugger.OnTriggerAction(id);
+		}
+
+		/// <summary>
+		/// Save the current status of identifiers
+		/// </summary>
+		public static void SaveIdentifierStatus()
+		{
+			ActionRepo.SaveIdentifierStatus();
 		}
 
 		// Is key has been created or not

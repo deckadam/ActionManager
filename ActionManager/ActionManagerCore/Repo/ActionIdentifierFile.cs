@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using UnityEngine;
 
 namespace DeckAdam.ActionManager
@@ -10,30 +9,31 @@ namespace DeckAdam.ActionManager
 		internal static ActionIdentifierFile IdentifierFile;
 		public Identifier[] identifiers;
 
-		static ActionIdentifierFile()
+		private void CollectData()
 		{
-			IdentifierFile = LoadIdentifierState();
-		}
-
-		public ActionIdentifierFile()
-		{
-			var keys = ActionRepo.GetIdentifiers().Keys;
-			var count = keys.Count;
+			var count = ActionRepo.GetIdentifierCount();
 			identifiers = new Identifier[count];
-			foreach (var key in keys)
+
+			var loopCount = 0;
+			foreach (var val in ActionRepo.GetIdentifiers())
 			{
-				identifiers[key] = new Identifier(key, ActionRepo.GetIdentifierName(key), ActionRepo.GetConnectedListenersWithId(key));
+				identifiers[loopCount++] = new Identifier(val.Key,
+					val.Value,
+					ActionRepo.GetConnectedListenersWithId(val.Key));
 			}
 		}
 
 		internal static void SaveCurrentIdentifierState()
 		{
-			ActionManagerJSONLoader.SaveData(IdentifierFile);
+			IdentifierFile = new ActionIdentifierFile();
+			IdentifierFile.CollectData();
+			ActionManagerJSONLoader.SaveData(IdentifierFile, ActionManagerConstants.IdentifierFilePath);
 		}
 
-		internal static ActionIdentifierFile LoadIdentifierState()
+		internal static void LoadIdentifierState()
 		{
-			return ActionManagerJSONLoader.LoadData<ActionIdentifierFile>(ActionManagerConstants.IdentifierFilePath);
+			IdentifierFile = ActionManagerJSONLoader.LoadData<ActionIdentifierFile>(ActionManagerConstants.IdentifierFilePath);
+			Debug.Log("Saved");
 		}
 
 		[Serializable]

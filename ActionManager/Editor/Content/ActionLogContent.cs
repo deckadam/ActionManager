@@ -21,7 +21,6 @@ namespace DeckAdam.ActionManager.UIComponent
 
 		internal ActionLogContent()
 		{
-			Debug.Log(ActionRepo.GetLogTypes() == null);
 			foreach (var val in ActionRepo.GetLogTypes()) _logCondition[val.ToString()] = true;
 
 			_actionScrollableTextArea = new ActionScrollableTextArea(ActionStyle.ScrollableTextAreaStyle);

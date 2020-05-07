@@ -12,15 +12,21 @@ namespace DeckAdam.ActionManager
 		private ActionScrollableTextArea _actionScrollableTextArea;
 		private ActionVerticalArea _verticalTagArea;
 		private List<ActionButton> _idButtons;
+		private ActionButton _saveToFileButton;
+		private ActionButton _loadFromFileButton;
 
 		internal ActionIdContent()
 		{
 			_actionScrollableTextArea = new ActionScrollableTextArea(ActionStyle.ScrollableTextAreaStyle);
+			GetSelectedIdListeners(long.MinValue);
+			
 			var scrollBar = new ActionScrollBar();
 			_verticalTagArea = new ActionVerticalArea(scrollBar.BeginScrollView, scrollBar.EndScrollView);
-			GetSelectedIdListeners(long.MinValue);
 			_idButtons = new List<ActionButton>();
 			ActionRepo.OnIdentifiersUpdated += AdjustTagButtons;
+			
+			_saveToFileButton = new ActionButton(ActionManagerConstants.SavetoFile,SaveToFileButton);
+			_loadFromFileButton = new ActionButton(ActionManagerConstants.LoadFromFile,LoadFromSaveButton);
 		}
 
 		internal sealed override void Display(EditorWindow editor)
@@ -32,7 +38,10 @@ namespace DeckAdam.ActionManager
 		private void DrawTags(EditorWindow editor)
 		{
 			_verticalTagArea.BeginVerticalArea(0, 30, 200, (int) editor.position.height - 10);
-
+			
+			_saveToFileButton.ProcessButton();
+			_loadFromFileButton.ProcessButton();
+			
 			foreach (var label in _idButtons)
 				label.ProcessButton();
 
@@ -66,6 +75,17 @@ namespace DeckAdam.ActionManager
 			{
 				_idButtons.Add(new ActionButton(ActionRepo.GetIdentifierName(label), () => GetSelectedIdListeners(label)));
 			}
+		}
+
+		private void LoadFromSaveButton()
+		{
+			ActionRepo.LoadIdentifierStatus();
+			AdjustTagButtons();
+		}
+
+		private void SaveToFileButton()
+		{
+			ActionRepo.SaveIdentifierStatus();
 		}
 	}
 }

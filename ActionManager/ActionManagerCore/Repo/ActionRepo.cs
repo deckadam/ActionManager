@@ -10,14 +10,17 @@ namespace DeckAdam.ActionManager
 	{
 #if UNITY_ASSERTIONS
 		internal static Action OnIdentifiersUpdated;
-		
-		private static Dictionary<long, List<string>> _connectedListeners = new Dictionary<long, List<string>>();
-		private static Dictionary<long, string> _identifiers = new Dictionary<long, string>();
-		private static List<ActionManagerLog> _logs = new List<ActionManagerLog>();
+
+		private static Dictionary<long, List<string>> _connectedListeners;
+		private static Dictionary<long, string> _identifiers;
+		private static List<ActionManagerLog> _logs;
 		private static Array _logTypes;
 
 		static ActionRepo()
 		{
+			_connectedListeners = new Dictionary<long, List<string>>();
+			_identifiers = new Dictionary<long, string>();
+			_logs = new List<ActionManagerLog>();
 			_identifiers.Clear();
 			_logs.Clear();
 			_logTypes = Enum.GetValues(typeof(LogType));
@@ -34,9 +37,11 @@ namespace DeckAdam.ActionManager
 			foreach (var prop in properties)
 			{
 				var value = (long) prop.GetValue(null);
-				if (!_identifiers.ContainsKey(value))
-					_identifiers[value] = prop.Name;
+				if (_identifiers.ContainsKey(value)) continue;
+				_identifiers[value] = prop.Name;
+				_connectedListeners[value] = new List<string>();
 			}
+
 			OnIdentifiersUpdated?.Invoke();
 		}
 
@@ -69,18 +74,6 @@ namespace DeckAdam.ActionManager
 				_connectedListeners[id].Clear();
 		}
 
-		internal static void SaveIdentifierStatus()
-		{
-		}
-
-		private static void CreateIdentifierJSON()
-		{
-		}
-
-		internal static void LoadIdentifierStatus()
-		{
-		}
-
 		internal static void SaveLogStatus()
 		{
 		}
@@ -89,11 +82,45 @@ namespace DeckAdam.ActionManager
 		{
 		}
 
-		internal static string[] GetConnectedListenersWithId(long id) => _connectedListeners[id].ToArray();
+		internal static void SaveIdentifierStatus()
+		{
+			ActionIdentifierFile.SaveCurrentIdentifierState();
+		}
+
+		internal static void LoadIdentifierStatus()
+		{
+			ActionIdentifierFile.LoadIdentifierState();
+			var oldData = ActionIdentifierFile.IdentifierFile.identifiers;
+
+			foreach (var val in oldData)
+			{
+				ReinsertIdentifierNames(val.Id, val.Name);
+				ReinsertConnections(val.Id, val.ConnectedIdentifiers);
+			}
+		}
+
+		private static void ReinsertIdentifierNames(long identifier, string name)
+		{
+			_identifiers[identifier] = name;
+		}
+
+		private static void ReinsertConnections(long identifier, IEnumerable<string> connectedListener)
+		{
+			_connectedListeners[identifier] = connectedListener.ToList();
+		}
+
+		internal static string[] GetConnectedListenersWithId(long id)
+		{
+			Debug.Log(_connectedListeners == null);
+			if (_connectedListeners[id] == null) return null;
+			return _connectedListeners[id].ToArray();
+		}
+
 		internal static bool IsListenerConnectedWithId(long id) => _connectedListeners.ContainsKey(id);
 
 		internal static Dictionary<long, string> GetIdentifiers() => _identifiers;
 		internal static string GetIdentifierName(long id) => _identifiers[id];
+		internal static long GetIdentifierCount() => _identifiers.Count;
 
 		internal static IEnumerable<ActionManagerLog> GetLogs() => _logs.ToArray();
 

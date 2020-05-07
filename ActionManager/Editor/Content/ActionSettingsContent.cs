@@ -28,7 +28,7 @@ namespace DeckAdam.ActionManager
 				_colorPickers[val] = new ActionColorFieldWithLabel(val, ActionSettings.CurrentSettings.data[GetIndex(val)].GetColor());
 			}
 
-			_applyButton = new ActionButton(ActionManagerConstants.Apply,ActionSettings.SaveSettings);
+			_applyButton = new ActionButton(ActionManagerConstants.Apply, ActionSettings.SaveSettings);
 		}
 
 		internal sealed override void Display(EditorWindow editor)
