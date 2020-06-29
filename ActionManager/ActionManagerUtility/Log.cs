@@ -2,12 +2,12 @@
 
 namespace DeckAdam.ActionManager
 {
-	internal class ActionManagerLog
+	internal class Log
 	{
 		private string _log;
 		private float _time;
 
-		internal ActionManagerLog(LogType type, string log)
+		internal Log(LogType type, string log)
 		{
 			_time = Time.time - ActionManager.InitializationTime;
 			_log = log;

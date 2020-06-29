@@ -1,8 +1,9 @@
 ﻿using System.Diagnostics;
+using DeckAdam.ActionManager.Core.Repo;
 
 namespace DeckAdam.ActionManager
 {
-	public static class ActionManagerDebugger
+	public static class Debugger
 	{
 		//TODO: Colorized display to editor window, different color for different operations and changeable color option from settings menu
 		//TODO: Make txt file output option (Save button to editor window)
@@ -10,61 +11,61 @@ namespace DeckAdam.ActionManager
 		[Conditional("UNITY_ASSERTIONS")]
 		internal static void OnActionManagerInitialized()
 		{
-			CreateNewLog(ActionManagerLogCreator.GetActionManagerInitializedLog(), LogType.OnActionManagerInitialized);
+			CreateNewLog(LogCreator.GetActionManagerInitializedLog(), LogType.OnActionManagerInitialized);
 		}
-		
+
 		// TODO: Collect identifiers optimize
 		[Conditional("UNITY_ASSERTIONS")]
 		internal static void OnClearListeners()
 		{
-			ActionRepo.CollectIdentifiers();
-			ActionRepo.ClearListenerConnections();
-			CreateNewLog(ActionManagerLogCreator.GetOnClearListenersLog(), LogType.OnClearListeners);
+			Repository.CollectIdentifiers();
+			Repository.ClearListenerConnections();
+			CreateNewLog(LogCreator.GetOnClearListenersLog(), LogType.OnClearListeners);
 		}
 
 		[Conditional("UNITY_ASSERTIONS")]
 		internal static void OnRemoveListener(long id, string name)
 		{
-			ActionRepo.CollectIdentifiers();
-			ActionRepo.SevereListenerConnection(id, name);
-			CreateNewLog(ActionManagerLogCreator.GetOnRemoveListenerLog(id, name), LogType.OnRemoveListener);
+			Repository.CollectIdentifiers();
+			Repository.SevereListenerConnection(id, name);
+			CreateNewLog(LogCreator.GetOnRemoveListenerLog(id, name), LogType.OnRemoveListener);
 		}
 
 		[Conditional("UNITY_ASSERTIONS")]
 		internal static void OnActionAdded(long id, string name)
 		{
-			ActionRepo.CollectIdentifiers();
-			ActionRepo.AddListenerConnection(id, name);
-			CreateNewLog(ActionManagerLogCreator.GetOnActionAddedLog(id, name), LogType.OnActionAdded);
+			Repository.CollectIdentifiers();
+			Repository.AddListenerConnection(id, name);
+			CreateNewLog(LogCreator.GetOnActionAddedLog(id, name), LogType.OnActionAdded);
 		}
 
 		[Conditional("UNITY_ASSERTIONS")]
 		internal static void OnClearListener(long id)
 		{
-			ActionRepo.CollectIdentifiers();
-			ActionRepo.SevereIdConnection(id);
-			CreateNewLog(ActionManagerLogCreator.GetOnClearListenerLog(id), LogType.OnClearListener);
+			Repository.CollectIdentifiers();
+			Repository.SevereIdConnection(id);
+			CreateNewLog(LogCreator.GetOnClearListenerLog(id), LogType.OnClearListener);
 		}
 
 		[Conditional("UNITY_ASSERTIONS")]
 		internal static void OnTriggerAction(long id)
 		{
-			CreateNewLog(ActionManagerLogCreator.GetOnTriggerActionLog(id), LogType.OnTriggerAction);
+			CreateNewLog(LogCreator.GetOnTriggerActionLog(id), LogType.OnTriggerAction);
 		}
 
 #if UNITY_ASSERTIONS
 
 		private static void CreateNewLog(string log, LogType logType)
 		{
-			var result = ActionManagerConstants.NewLine + CollectStackTrace();
-			ActionRepo.AddLog(new ActionManagerLog(logType, result));
-			ActionManagerEditor.Instance?.RefreshTabs();
+			var result = Constants.NewLine + CollectStackTrace();
+			Repository.AddLog(new Log(logType, result));
+			EditoreCore.Instance?.RefreshTabs();
 		}
 
 		// TODO: Optimize this part (Probably there is better ways to do this)
 		private static string CollectStackTrace()
 		{
-			var allTrace = ActionManagerConstants.EmptyString;
+			var allTrace = string.Empty;
 			var stackTrace = new StackTrace(true);
 			var count = stackTrace.FrameCount;
 
@@ -72,12 +73,12 @@ namespace DeckAdam.ActionManager
 			{
 				var frame = stackTrace.GetFrame(i);
 				var newLog = frame.GetFileName() +
-				             ActionManagerConstants.DoubleSpace +
+				             Constants.DoubleSpace +
 				             frame.GetMethod().Name +
-				             ActionManagerConstants.DoubleSpace +
+				             Constants.DoubleSpace +
 				             frame.GetFileLineNumber();
 				newLog = GetCroppedLog(newLog);
-				allTrace += newLog + ActionManagerConstants.NewLine;
+				allTrace += newLog + Constants.NewLine;
 			}
 
 			return allTrace;
@@ -86,10 +87,10 @@ namespace DeckAdam.ActionManager
 
 		private static string GetCroppedLog(string logToCrop)
 		{
-			var splittedText = logToCrop.Split(ActionManagerConstants.Divider);
-			var returnString = ActionManagerConstants.EmptyString;
+			var splittedText = logToCrop.Split(Constants.Divider);
+			var returnString = string.Empty;
 
-			for (var i = ActionSettings.CurrentSettings.logRemoveIndex; i < splittedText.Length; i++)
+			for (var i = Settings.CurrentSettings.logRemoveIndex; i < splittedText.Length; i++)
 				returnString += splittedText[i];
 
 			return returnString;

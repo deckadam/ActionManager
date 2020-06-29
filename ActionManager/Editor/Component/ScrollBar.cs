@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace DeckAdam.ActionManager.UIComponent
 {
-	internal class ActionScrollBar
+	internal class ScrollBar
 	{
 		private Vector2 _scrollAmount;
 

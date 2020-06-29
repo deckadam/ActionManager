@@ -2,7 +2,7 @@
 
 namespace DeckAdam.ActionManager.UIComponent
 {
-	internal class ActionContent
+	internal class Content
 	{
 		internal virtual string ContentName => "Default name";
 

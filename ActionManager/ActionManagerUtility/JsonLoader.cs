@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace DeckAdam.ActionManager
 {
-	internal class ActionManagerJSONLoader
+	internal class JsonLoader
 	{
 		internal static T LoadData<T>(string filePath) where T : new()
 		{

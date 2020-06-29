@@ -3,12 +3,12 @@ using UnityEngine;
 
 namespace DeckAdam.ActionManager.UIComponent
 {
-	internal class ActionColorFieldWithLabel
+	internal class ColorFieldWithLabel
 	{
 		private Color _color;
 		private string _label;
 
-		internal ActionColorFieldWithLabel(string label, Color initialColor)
+		internal ColorFieldWithLabel(string label, Color initialColor)
 		{
 			_label = label;
 			_color = initialColor;

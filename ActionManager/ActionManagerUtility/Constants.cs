@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace DeckAdam.ActionManager
 {
-	internal static class ActionManagerConstants
+	internal static class Constants
 	{
 		//TODO: Transfer all strings to constants
 		//TODO: Read the strings from json file
@@ -14,15 +14,16 @@ namespace DeckAdam.ActionManager
 		internal readonly static string Title = "Action manager debugger";
 		internal readonly static string SettingsFilePath = Application.dataPath + "/Settings.json";
 		internal readonly static string IdentifierFilePath = Application.dataPath + "/IdentifierState.json";
-		internal readonly static string EmptyString = "";
 		internal readonly static char Divider = '\\';
-		internal readonly static char OpenParanthesis = '(';
-		internal readonly static char CloseParanthesis = ')';
 		internal readonly static string SelectAll = "Select all";
 		internal readonly static string DeselectAll = "Deselect all";
 		internal readonly static string SavetoFile = "Save";
 		internal readonly static string LoadFromFile = "Load";
 
+		internal static string SurrounWithParanthesis(string value) => '(' + value + ')';
+		internal static string SurrounWithParanthesis(long value) => '(' + value.ToString() + ')';
+
+		//TODO: Debug template implementation
 		#region Debug templates
 
 		#endregion

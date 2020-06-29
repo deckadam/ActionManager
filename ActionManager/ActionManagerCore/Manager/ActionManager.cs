@@ -1,17 +1,18 @@
 using System;
 using System.Collections.Generic;
-using DeckAdam.ActionManager;
-using JetBrains.Annotations;
+using DeckAdam.ActionManager.Core.Repo;
 using UnityEngine;
+using Event = DeckAdam.ActionManager.Core.Event;
 
 namespace DeckAdam.ActionManager
 {
 	public static class ActionManager
 	{
+		//TODO: Find out how to make attributes functional to use in debugger invokes
 		internal static float InitializationTime;
 
 		// Dictionary for holding all events in order
-		private static Dictionary<long, EventHolder> _eventListeners;
+		private static Dictionary<long, Event> _eventListeners;
 		internal static Type EventClass;
 
 		// Index holder for trigger parameter
@@ -31,10 +32,10 @@ namespace DeckAdam.ActionManager
 		/// </param>
 		public static void Init(Type eventClass)
 		{
-			_eventListeners = new Dictionary<long, EventHolder>();
+			_eventListeners = new Dictionary<long, Event>();
 			InitializationTime = Time.time;
 			EventClass = eventClass;
-			ActionManagerDebugger.OnActionManagerInitialized();
+			Debugger.OnActionManagerInitialized();
 		}
 
 
@@ -44,7 +45,7 @@ namespace DeckAdam.ActionManager
 		public static void ClearListeners()
 		{
 			_eventListeners.Clear();
-			ActionManagerDebugger.OnClearListeners();
+			Debugger.OnClearListeners();
 		}
 
 		/// <summary>
@@ -60,7 +61,7 @@ namespace DeckAdam.ActionManager
 		{
 			if (_eventListeners.TryGetValue(id, out var temp))
 				temp.RemoveListener(processToRemove);
-			ActionManagerDebugger.OnRemoveListener(id, processToRemove.Method.Name);
+			Debugger.OnRemoveListener(id, processToRemove.Method.Name);
 		}
 
 		/// <summary>
@@ -76,10 +77,10 @@ namespace DeckAdam.ActionManager
 		{
 			IfKeyExistsDo(id, () => _eventListeners[id].AddListener(newAction), () =>
 			{
-				_eventListeners[id] = new EventHolder();
+				_eventListeners[id] = new Event();
 				_eventListeners[id].AddListener(newAction);
 			});
-			ActionManagerDebugger.OnActionAdded(id, newAction.Method.Name);
+			Debugger.OnActionAdded(id, newAction.Method.Name);
 		}
 
 
@@ -92,7 +93,7 @@ namespace DeckAdam.ActionManager
 		public static void ClearListener(long id)
 		{
 			IfKeyExistsDo(id, () => _eventListeners[id].ClearListener());
-			ActionManagerDebugger.OnClearListener(id);
+			Debugger.OnClearListener(id);
 		}
 
 		/// <summary>
@@ -104,7 +105,7 @@ namespace DeckAdam.ActionManager
 		public static void TriggerAction(long id)
 		{
 			IfKeyExistsDo(id, () => _eventListeners[id].ProcessDelegates());
-			ActionManagerDebugger.OnTriggerAction(id);
+			Debugger.OnTriggerAction(id);
 		}
 
 		/// <summary>
@@ -112,7 +113,7 @@ namespace DeckAdam.ActionManager
 		/// </summary>
 		public static void SaveIdentifierStatus()
 		{
-			ActionRepo.SaveIdentifierStatus();
+			Repository.SaveIdentifierStatus();
 		}
 
 		// Is key has been created or not
@@ -126,35 +127,5 @@ namespace DeckAdam.ActionManager
 		{
 			(IsKeyContained(id) ? ifToDo : elseToDo)?.Invoke();
 		}
-
-		#region Nested type: EventHolder
-
-		// Data holder class which works internally
-		private class EventHolder
-		{
-			private Action _thisAction;
-
-			internal void ProcessDelegates()
-			{
-				_thisAction?.Invoke();
-			}
-
-			internal void AddListener([NotNull] Action newAction)
-			{
-				_thisAction += newAction;
-			}
-
-			internal void RemoveListener([NotNull] Action oldAction)
-			{
-				_thisAction -= oldAction;
-			}
-
-			internal void ClearListener()
-			{
-				_thisAction = null;
-			}
-		}
-
-		#endregion
 	}
 }

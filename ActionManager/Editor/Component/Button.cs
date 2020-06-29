@@ -5,11 +5,11 @@ using UnityEngine;
 
 namespace DeckAdam.ActionManager.UIComponent
 {
-	internal class ActionButton
+	internal class Button
 	{
 		private string _text;
 		private Action _actionToProcess;
-		internal ActionButton(string text,Action actionToProcess)
+		internal Button(string text,Action actionToProcess)
 		{
 			_text = text;
 			_actionToProcess = actionToProcess;

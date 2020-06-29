@@ -1,23 +1,23 @@
 ﻿using System.Collections.Generic;
+using DeckAdam.ActionManager.Core.Repo;
 using DeckAdam.ActionManager.UIComponent;
 using UnityEditor;
-using UnityEngine;
 
-namespace DeckAdam.ActionManager
+namespace DeckAdam.ActionManager.SettingsContent
 {
-	internal class ActionSettingsContent : ActionContent
+	internal class SettingsContent : Content
 	{
 		internal override string ContentName => "Settings";
 
 		private Dictionary<string, int> _labelTable = new Dictionary<string, int>();
-		private Dictionary<string, ActionColorFieldWithLabel> _colorPickers = new Dictionary<string, ActionColorFieldWithLabel>();
-		private ActionButton _applyButton;
+		private Dictionary<string, ColorFieldWithLabel> _colorPickers = new Dictionary<string, ColorFieldWithLabel>();
+		private Button _applyButton;
 		private List<string> _keys;
 
-		internal ActionSettingsContent()
+		internal SettingsContent()
 		{
 			var counter = 0;
-			foreach (var val in ActionRepo.GetLogTypes())
+			foreach (var val in Repository.GetLogTypes())
 			{
 				_labelTable[val.ToString()] = counter++;
 			}
@@ -25,10 +25,10 @@ namespace DeckAdam.ActionManager
 			_keys = new List<string>(_labelTable.Keys);
 			foreach (var val in _keys)
 			{
-				_colorPickers[val] = new ActionColorFieldWithLabel(val, ActionSettings.CurrentSettings.data[GetIndex(val)].GetColor());
+				_colorPickers[val] = new ColorFieldWithLabel(val, Settings.CurrentSettings.data[GetIndex(val)].GetColor());
 			}
 
-			_applyButton = new ActionButton(ActionManagerConstants.Apply, ActionSettings.SaveSettings);
+			_applyButton = new Button(Constants.Apply, Settings.SaveSettings);
 		}
 
 		internal sealed override void Display(EditorWindow editor)
@@ -43,7 +43,7 @@ namespace DeckAdam.ActionManager
 			{
 				var result = _colorPickers[label].DrawColorField();
 				var index = GetIndex(label);
-				ActionSettings.CurrentSettings.data[index].SetColor(result);
+				Settings.CurrentSettings.data[index].SetColor(result);
 			}
 		}
 

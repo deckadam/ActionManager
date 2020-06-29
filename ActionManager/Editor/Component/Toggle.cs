@@ -2,7 +2,7 @@
 
 namespace DeckAdam.ActionManager.UIComponent
 {
-	internal class ActionToggle
+	internal class Toggle
 	{
 		private bool _value = true;
 

@@ -3,29 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace DeckAdam.ActionManager
+namespace DeckAdam.ActionManager.Core.Repo
 {
-	internal static class ActionRepo
+	internal static class Repository
 	{
 #if UNITY_ASSERTIONS
 		internal static Action OnIdentifiersUpdated;
 
 		private static Dictionary<long, List<string>> _connectedListeners;
 		private static Dictionary<long, string> _identifiers;
-		private static List<ActionManagerLog> _logs;
+		private static List<Log> _logs;
 		private static Array _logTypes;
 
-		static ActionRepo()
+		static Repository()
 		{
 			_connectedListeners = new Dictionary<long, List<string>>();
 			_identifiers = new Dictionary<long, string>();
-			_logs = new List<ActionManagerLog>();
+			_logs = new List<Log>();
 			_identifiers.Clear();
 			_logs.Clear();
 			_logTypes = Enum.GetValues(typeof(LogType));
 		}
 
-		internal static void AddLog(ActionManagerLog newLog)
+		internal static void AddLog(Log newLog)
 		{
 			_logs.Add(newLog);
 		}
@@ -73,6 +73,8 @@ namespace DeckAdam.ActionManager
 				_connectedListeners[id].Clear();
 		}
 
+		
+		//TODO: Implement save and load system for logs
 		internal static void SaveLogStatus()
 		{
 		}
@@ -83,18 +85,18 @@ namespace DeckAdam.ActionManager
 
 		internal static void SaveIdentifierStatus()
 		{
-			ActionIdentifierFile.SaveCurrentIdentifierState();
+			IdentifierFile.SaveCurrentIdentifierState();
 		}
 
 		internal static void LoadIdentifierStatus()
 		{
-			ActionIdentifierFile.LoadIdentifierState();
-			var oldData = ActionIdentifierFile.IdentifierFile.identifiers;
+			IdentifierFile.LoadIdentifierState();
+			var oldData = IdentifierFile.identifierFile.identifiers;
 
 			foreach (var val in oldData)
 			{
-				ReinsertIdentifierNames(val.Id, val.Name);
-				ReinsertConnections(val.Id, val.ConnectedIdentifiers);
+				ReinsertIdentifierNames(val.id, val.name);
+				ReinsertConnections(val.id, val.connectedIdentifiers);
 			}
 		}
 
@@ -110,22 +112,29 @@ namespace DeckAdam.ActionManager
 
 		internal static string[] GetConnectedListenersWithId(long id)
 		{
-			Debug.Log(_connectedListeners == null);
 			if (_connectedListeners[id] == null) return null;
 			return _connectedListeners[id].ToArray();
 		}
 
+		//Connected listener checks
 		internal static bool IsListenerConnectedWithId(long id) => _connectedListeners.ContainsKey(id);
+		
+		private static bool CheckListenerStatus(long id) => _connectedListeners.ContainsKey(id) && _connectedListeners[id] != null;
 
+		
+		// Identifier checks
 		internal static Dictionary<long, string> GetIdentifiers() => _identifiers;
+		
 		internal static string GetIdentifierName(long id) => _identifiers[id];
+		
 		internal static long GetIdentifierCount() => _identifiers.Count;
 
-		internal static IEnumerable<ActionManagerLog> GetLogs() => _logs.ToArray();
+		
+		// Log checks
+		internal static IEnumerable<Log> GetLogs() => _logs.ToArray();
 
 		internal static Array GetLogTypes() => _logTypes;
 
-		private static bool CheckListenerStatus(long id) => (_connectedListeners.ContainsKey(id) && _connectedListeners[id] != null);
 
 
 #endif

@@ -4,13 +4,13 @@ using UnityEngine;
 
 namespace DeckAdam.ActionManager
 {
-	internal class ActionScrollableTextArea
+	internal class ScrollableTextArea
 	{
 		private StringBuilder _data;
 		private GUIStyle _style;
 		private Vector2 _scroll;
 
-		public ActionScrollableTextArea(GUIStyle style)
+		public ScrollableTextArea(GUIStyle style)
 		{
 			_data = new StringBuilder();
 			_scroll = Vector2.zero;

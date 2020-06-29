@@ -4,18 +4,18 @@ using UnityEngine;
 namespace DeckAdam.ActionManager
 {
 	[Serializable]
-	internal class ActionSettings
+	internal class Settings
 	{
-		internal static ActionSettings CurrentSettings;
+		internal static Settings CurrentSettings;
 		public ActionTypeColorData[] data;
 		public int logRemoveIndex = 0;
 
-		static ActionSettings()
+		static Settings()
 		{
 			CurrentSettings = LoadSettings();
 		}
 
-		public ActionSettings()
+		public Settings()
 		{
 			var values = Enum.GetValues(typeof(LogType));
 			InitializeColors(values);
@@ -30,14 +30,14 @@ namespace DeckAdam.ActionManager
 			}
 		}
 
-		internal static ActionSettings LoadSettings()
+		internal static Settings LoadSettings()
 		{
-			return ActionManagerJSONLoader.LoadData<ActionSettings>(ActionManagerConstants.SettingsFilePath);
+			return JsonLoader.LoadData<Settings>(Constants.SettingsFilePath);
 		}
 
 		internal static void SaveSettings()
 		{
-			ActionManagerJSONLoader.SaveData(CurrentSettings, ActionManagerConstants.SettingsFilePath);
+			JsonLoader.SaveData(CurrentSettings, Constants.SettingsFilePath);
 		}
 	}
 

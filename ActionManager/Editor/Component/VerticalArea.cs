@@ -4,12 +4,12 @@ using UnityEngine;
 
 namespace DeckAdam.ActionManager.UIComponent
 {
-	internal class ActionVerticalArea
+	internal class VerticalArea
 	{
 		private Action _onBegin;
 		private Action _onEnd;
 
-		internal ActionVerticalArea(Action onBegin = null, Action onEnd = null)
+		internal VerticalArea(Action onBegin = null, Action onEnd = null)
 		{
 			_onBegin = onBegin;
 			_onEnd = onEnd;

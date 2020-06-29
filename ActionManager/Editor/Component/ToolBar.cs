@@ -2,12 +2,12 @@
 
 namespace DeckAdam.ActionManager.UIComponent
 {
-	internal class ActionToolBar
+	internal class ToolBar
 	{
 		private string[] _content;
 		private int _currentTab = 0;
 
-		internal ActionToolBar(string[] content)
+		internal ToolBar(string[] content)
 		{
 			_content = content;
 		}
