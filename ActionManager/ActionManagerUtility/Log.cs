@@ -1,25 +1,25 @@
-﻿using UnityEngine;
+﻿using System;
 
 namespace DeckAdam.ActionManager
 {
+	[Serializable]
 	internal class Log
 	{
-		private string _log;
-		private float _time;
+		public LogType Type;
+		public string LogData;
+		public float Time;
 
-		internal Log(LogType type, string log)
+		internal Log(LogType type, string logData)
 		{
-			_time = Time.time - ActionManager.InitializationTime;
-			_log = log;
+			Time = UnityEngine.Time.time - ActionManager.InitializationTime;
+			LogData = logData;
 			Type = type;
 		}
 
 
-		internal LogType Type { get; }
-
 		public override string ToString()
 		{
-			return _time + "  " + Type + "  " + _log;
+			return Time + "  " + Type + "  " + LogData;
 		}
 	}
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 namespace DeckAdam.ActionManager.Core.Repo
 {
@@ -73,16 +72,6 @@ namespace DeckAdam.ActionManager.Core.Repo
 				_connectedListeners[id].Clear();
 		}
 
-		
-		//TODO: Implement save and load system for logs
-		internal static void SaveLogStatus()
-		{
-		}
-
-		internal static void LoadLogStatus()
-		{
-		}
-
 		internal static void SaveIdentifierStatus()
 		{
 			IdentifierFile.SaveCurrentIdentifierState();
@@ -112,29 +101,48 @@ namespace DeckAdam.ActionManager.Core.Repo
 
 		internal static string[] GetConnectedListenersWithId(long id)
 		{
-			if (_connectedListeners[id] == null) return null;
-			return _connectedListeners[id].ToArray();
+			return _connectedListeners[id] == null ? null : _connectedListeners[id].ToArray();
 		}
 
 		//Connected listener checks
-		internal static bool IsListenerConnectedWithId(long id) => _connectedListeners.ContainsKey(id);
-		
-		private static bool CheckListenerStatus(long id) => _connectedListeners.ContainsKey(id) && _connectedListeners[id] != null;
+		internal static bool IsListenerConnectedWithId(long id)
+		{
+			return _connectedListeners.ContainsKey(id);
+		}
 
-		
+		private static bool CheckListenerStatus(long id)
+		{
+			return _connectedListeners.ContainsKey(id) && _connectedListeners[id] != null;
+		}
+
+
 		// Identifier checks
-		internal static Dictionary<long, string> GetIdentifiers() => _identifiers;
-		
-		internal static string GetIdentifierName(long id) => _identifiers[id];
-		
-		internal static long GetIdentifierCount() => _identifiers.Count;
+		internal static Dictionary<long, string> GetIdentifiers()
+		{
+			return _identifiers;
+		}
 
-		
+		internal static string GetIdentifierName(long id)
+		{
+			return _identifiers[id];
+		}
+
+		internal static long GetIdentifierCount()
+		{
+			return _identifiers.Count;
+		}
+
+
 		// Log checks
-		internal static IEnumerable<Log> GetLogs() => _logs.ToArray();
+		internal static IEnumerable<Log> GetLogs()
+		{
+			return _logs.ToArray();
+		}
 
-		internal static Array GetLogTypes() => _logTypes;
-
+		internal static Array GetLogTypes()
+		{
+			return _logTypes;
+		}
 
 
 #endif

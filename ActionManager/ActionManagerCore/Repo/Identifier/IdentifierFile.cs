@@ -7,6 +7,7 @@ namespace DeckAdam.ActionManager
 	internal class IdentifierFile
 	{
 		internal static IdentifierFile identifierFile;
+		
 		public ActionIdentifier[] identifiers;
 
 		private void CollectData()

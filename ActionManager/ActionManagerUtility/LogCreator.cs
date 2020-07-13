@@ -2,61 +2,50 @@
 {
 	internal class LogCreator
 	{
-		private static string ActionManagerInitializedLog => "Action manager initialized from";
-
 		internal static string GetActionManagerInitializedLog()
 		{
-			return ActionManagerInitializedLog;
+			return Constants.ActionManagerInitializedLog;
 		}
 
-		private static string OnClearListenersLog => "All subscribers cleared";
 
 		internal static string GetOnClearListenersLog()
 		{
-			return OnClearListenersLog;
+			return Constants.OnClearListenersLog;
 		}
 
-		private static string OnRemoveListenerHeader => "Subscriber removed with id ";
-		private static string OnRemoveListenerBody => " from with name ";
 
 		internal static string GetOnRemoveListenerLog(long id, string name)
 		{
-			var result = OnRemoveListenerHeader;
+			var result = Constants.OnRemoveListenerHeader;
 			result += Constants.SurrounWithParanthesis(id);
-			result += OnRemoveListenerBody;
+			result += Constants.OnRemoveListenerBody;
 			result += Constants.SurrounWithParanthesis(name);
 			return result;
 		}
 
-		private static string OnActionAddedHeader => "Subscribed to event with id ";
-		private static string OnActionAddedBody => " with name ";
-		private static string OnActionAddedClosure => " from";
 
 		internal static string GetOnActionAddedLog(long id, string name)
 		{
-			var result = OnActionAddedHeader;
+			var result = Constants.OnActionAddedHeader;
 			result += Constants.SurrounWithParanthesis(id);
-			result += OnActionAddedBody;
+			result += Constants.OnActionAddedBody;
 			result += Constants.SurrounWithParanthesis(name);
-			result += OnActionAddedClosure;
+			result += Constants.OnActionAddedClosure;
 			return result;
 		}
 
-
-		private static string OnClearListenerHeader => "Event listeners cleared with id ";
 
 		internal static string GetOnClearListenerLog(long id)
 		{
-			var result = OnClearListenerHeader;
-			int.Parse(result += Constants.SurrounWithParanthesis(id));
+			var result = Constants.OnClearListenerHeader;
+			result += Constants.SurrounWithParanthesis(id);
 			return result;
 		}
 
-		private static string OnTriggerActionHeader => "Event raised with id ";
 
 		internal static string GetOnTriggerActionLog(long id)
 		{
-			var result = OnTriggerActionHeader;
+			var result = Constants.OnTriggerActionHeader;
 			result += Constants.SurrounWithParanthesis(id);
 			return result;
 		}

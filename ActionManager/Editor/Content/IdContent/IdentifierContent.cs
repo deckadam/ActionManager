@@ -5,10 +5,8 @@ using UnityEngine;
 
 namespace DeckAdam.ActionManager.UIComponent.IdentifierCountent
 {
-	internal class IdentifierContent : Content
+	internal class IdentifierContent :  Content
 	{
-		internal override string ContentName => "Identifiers";
-
 		private ScrollableTextArea _actionScrollableTextArea;
 		private VerticalArea _verticalTagArea;
 		private List<Button> _idButtons;
@@ -40,10 +38,14 @@ namespace DeckAdam.ActionManager.UIComponent.IdentifierCountent
 			DrawTextArea(editor);
 		}
 
+		internal override void Refresh()
+		{
+			AdjustTagButtons();
+		}
+
 		private void DrawTags(EditorWindow editor)
 		{
 			_verticalTagArea.BeginVerticalArea(0, 30, 200, (int) editor.position.height - 10);
-
 			_saveToFileButton.ProcessButton();
 			_loadFromFileButton.ProcessButton();
 

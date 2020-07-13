@@ -8,16 +8,15 @@ namespace DeckAdam.ActionManager.UIComponent.LogContent
 {
 	internal class LogContent : Content
 	{
-		internal override string ContentName => "Logs";
-
 		//TODO: Cache key states
-		//TODO: Clear selection and select all buttons
 		private Dictionary<string, Toggle> _toggles = new Dictionary<string, Toggle>();
 		private Dictionary<string, bool> _logCondition = new Dictionary<string, bool>();
 		private ScrollableTextArea _actionScrollableTextArea;
 		private VerticalArea _actionVerticalArea;
 		private Button _deselectAllButton;
 		private Button _selectAllButton;
+		private Button _saveButton;
+		private Button _loadButton;
 		private List<string> _keys;
 
 		internal LogContent()
@@ -41,6 +40,9 @@ namespace DeckAdam.ActionManager.UIComponent.LogContent
 
 			_selectAllButton = new Button(Constants.SelectAll, () => SetAllKeys(true));
 			_deselectAllButton = new Button(Constants.DeselectAll, () => SetAllKeys(false));
+
+			_saveButton = new Button(Constants.SavetoFile, Save);
+			_loadButton = new Button(Constants.LoadFromFile, Load);
 		}
 
 		internal sealed override void Display(EditorWindow editor)
@@ -53,6 +55,16 @@ namespace DeckAdam.ActionManager.UIComponent.LogContent
 		{
 			_actionVerticalArea.BeginVerticalArea(0, 30, 200, (int) editor.position.height - 10);
 
+			_selectAllButton.ProcessButton();
+			_deselectAllButton.ProcessButton();
+
+			GUILayout.Space(10f);
+
+			_saveButton.ProcessButton();
+			_loadButton.ProcessButton();
+
+			GUILayout.Space(10f);
+
 			foreach (var enumValue in _keys)
 			{
 				var temp = _logCondition[enumValue];
@@ -60,8 +72,7 @@ namespace DeckAdam.ActionManager.UIComponent.LogContent
 				if (temp != _logCondition[enumValue]) Refresh();
 			}
 
-			_selectAllButton.ProcessButton();
-			_deselectAllButton.ProcessButton();
+
 			_actionVerticalArea.EndVerticalArea();
 		}
 
@@ -79,7 +90,9 @@ namespace DeckAdam.ActionManager.UIComponent.LogContent
 			_actionScrollableTextArea.ClearContext();
 
 			foreach (var log in allLogs.Where(log => _logCondition[log.Type.ToString()]))
+			{
 				_actionScrollableTextArea.AppendContext(log + Constants.NewLine);
+			}
 		}
 
 		private void SetAllKeys(bool value)
@@ -87,6 +100,23 @@ namespace DeckAdam.ActionManager.UIComponent.LogContent
 			foreach (var enumValue in _toggles.Keys)
 				_toggles[enumValue].SetToggleStatus(value);
 
+			Refresh();
+		}
+
+		private void Save()
+		{
+			var allLogs = Repository.GetLogs();
+			var selectedLogs = allLogs.Where(log => _logCondition[log.Type.ToString()]).ToList();
+			LogFile.SaveLogFile(selectedLogs.ToArray());
+		}
+
+		private void Load()
+		{
+			var logs = LogFile.LoadLogFile().SavedLog;
+			foreach (var log in logs)
+			{
+				Repository.AddLog(log);
+			}
 			Refresh();
 		}
 	}

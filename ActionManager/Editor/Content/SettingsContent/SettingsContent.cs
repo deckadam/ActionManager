@@ -3,12 +3,10 @@ using DeckAdam.ActionManager.Core.Repo;
 using DeckAdam.ActionManager.UIComponent;
 using UnityEditor;
 
-namespace DeckAdam.ActionManager.SettingsContent
+namespace DeckAdam.ActionManager.UIComponent.SettingsContent
 {
 	internal class SettingsContent : Content
 	{
-		internal override string ContentName => "Settings";
-
 		private Dictionary<string, int> _labelTable = new Dictionary<string, int>();
 		private Dictionary<string, ColorFieldWithLabel> _colorPickers = new Dictionary<string, ColorFieldWithLabel>();
 		private Button _applyButton;

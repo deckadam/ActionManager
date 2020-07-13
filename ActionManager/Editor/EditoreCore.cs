@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using DeckAdam.ActionManager.SettingsContent;
 using DeckAdam.ActionManager.UIComponent;
 using DeckAdam.ActionManager.UIComponent.IdentifierCountent;
 using DeckAdam.ActionManager.UIComponent.LogContent;
+using DeckAdam.ActionManager.UIComponent.SettingsContent;
 using UnityEditor;
 
 namespace DeckAdam.ActionManager
@@ -30,7 +30,15 @@ namespace DeckAdam.ActionManager
 		{
 			if (_contents == null) Initialize();
 			var result = _actionToolBar.DrawToolbar();
+			RefreshIfTabIsChanged(result);
 			_contents[result].Display(this);
+		}
+
+		private void RefreshIfTabIsChanged(int newSelectionIndex)
+		{
+			if (_tabLayout == newSelectionIndex) return;
+			_contents[newSelectionIndex].Refresh();
+			_tabLayout = newSelectionIndex;
 		}
 
 		private void Initialize()
@@ -40,10 +48,10 @@ namespace DeckAdam.ActionManager
 			{
 				new LogContent(),
 				new IdentifierContent(),
-				new SettingsContent.SettingsContent()
+				new SettingsContent()
 			};
 
-			_actionToolBar = new ToolBar(new string[]
+			_actionToolBar = new ToolBar(new[]
 			{
 				_contents[0].ContentName,
 				_contents[1].ContentName,

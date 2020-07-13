@@ -13,6 +13,7 @@ namespace DeckAdam.ActionManager
 
 		// Dictionary for holding all events in order
 		private static Dictionary<long, Event> _eventListeners;
+		
 		internal static Type EventClass;
 
 		// Index holder for trigger parameter

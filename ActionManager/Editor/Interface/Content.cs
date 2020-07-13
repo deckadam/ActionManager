@@ -4,7 +4,7 @@ namespace DeckAdam.ActionManager.UIComponent
 {
 	internal class Content
 	{
-		internal virtual string ContentName => "Default name";
+		internal string ContentName => GetType().Name;
 
 		internal virtual void Display(EditorWindow editor)
 		{

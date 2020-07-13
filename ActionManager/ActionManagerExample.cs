@@ -21,9 +21,10 @@ public class ActionManagerExample : MonoBehaviour
 		ActionManager.AddAction(Events.ActionManagerExampleEvent, () => Debug.Log("Never triggered event"));
 		// This anonymous event submissions will be visible in debugger window separately
 
+
+		ActionManager.ClearListener(0);
 		// Start timed event for triggering event
 		StartCoroutine(TestTrigger());
-		
 	}
 
 	private void TestMethod()
@@ -43,12 +44,11 @@ public class ActionManagerExample : MonoBehaviour
 		// You can see this action with its own name from ActionManagerDebugger window with clicking to ConnectedEventId button
 		ActionManager.AddAction(Events.ConnectedEventId, ConnectedMethodExample);
 		ActionManager.SaveIdentifierStatus();
-
 	}
 
 	private void ConnectedMethodExample()
 	{
-		Debug.Log("This method will be visible in debugger window with");
+		Debug.Log("This method will be visible in debugger window with name");
 	}
 }
 
