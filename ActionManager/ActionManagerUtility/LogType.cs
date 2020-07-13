@@ -7,6 +7,7 @@
 		OnRemoveListener,
 		OnActionAdded,
 		OnClearListener,
-		OnTriggerAction
+		OnTriggerAction,
+		OnInvallidOperation
 	}
 }

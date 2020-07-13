@@ -3,7 +3,7 @@ using DeckAdam.ActionManager.Core.Repo;
 
 namespace DeckAdam.ActionManager
 {
-	public static class Debugger
+	public static partial class Debugger
 	{
 		//TODO: Colorized display to editor window, different color for different operations and changeable color option from settings menu
 		//TODO: Make txt file output option (Save button to editor window)
@@ -52,50 +52,5 @@ namespace DeckAdam.ActionManager
 		{
 			CreateNewLog(LogCreator.GetOnTriggerActionLog(id), LogType.OnTriggerAction);
 		}
-
-#if UNITY_ASSERTIONS
-
-		private static void CreateNewLog(string log, LogType logType)
-		{
-			var result = Constants.NewLine + CollectStackTrace();
-			Repository.AddLog(new Log(logType, result));
-			EditoreCore.Instance?.RefreshTabs();
-		}
-
-		// TODO: Optimize this part (Probably there is better ways to do this)
-		private static string CollectStackTrace()
-		{
-			var allTrace = string.Empty;
-			var stackTrace = new StackTrace(true);
-			var count = stackTrace.FrameCount;
-
-			for (var i = 0; i < count; i++)
-			{
-				var frame = stackTrace.GetFrame(i);
-				var newLog = frame.GetFileName() +
-				             Constants.DoubleSpace +
-				             frame.GetMethod().Name +
-				             Constants.DoubleSpace +
-				             frame.GetFileLineNumber();
-				newLog = GetCroppedLog(newLog);
-				allTrace += newLog + Constants.NewLine;
-			}
-
-			return allTrace;
-		}
-
-
-		private static string GetCroppedLog(string logToCrop)
-		{
-			var splittedText = logToCrop.Split(Constants.Divider);
-			var returnString = string.Empty;
-
-			for (var i = Settings.CurrentSettings.logRemoveIndex; i < splittedText.Length; i++)
-				returnString += splittedText[i];
-
-			return returnString;
-		}
-
-#endif
 	}
 }

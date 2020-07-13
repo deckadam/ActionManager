@@ -10,10 +10,11 @@ namespace DeckAdam.ActionManager
 	{
 		//TODO: Find out how to make attributes functional to use in debugger invokes
 		internal static float InitializationTime;
+		internal static bool isInitialized = false;
 
 		// Dictionary for holding all events in order
 		private static Dictionary<long, Event> _eventListeners;
-		
+
 		internal static Type EventClass;
 
 		// Index holder for trigger parameter
@@ -33,6 +34,13 @@ namespace DeckAdam.ActionManager
 		/// </param>
 		public static void Init(Type eventClass)
 		{
+			if (isInitialized)
+			{
+				Debugger.OnReinitialization();
+				return;
+			}
+
+			isInitialized = true;
 			_eventListeners = new Dictionary<long, Event>();
 			InitializationTime = Time.time;
 			EventClass = eventClass;
@@ -45,7 +53,14 @@ namespace DeckAdam.ActionManager
 		/// </summary>
 		public static void ClearListeners()
 		{
+			if (!isInitialized)
+			{
+				Debugger.OnInvalidClearListeners();
+				return;
+			}
+
 			_eventListeners.Clear();
+			_lastEventId = long.MinValue;
 			Debugger.OnClearListeners();
 		}
 
@@ -61,8 +76,14 @@ namespace DeckAdam.ActionManager
 		public static void RemoveListener(long id, Action processToRemove)
 		{
 			if (_eventListeners.TryGetValue(id, out var temp))
+			{
 				temp.RemoveListener(processToRemove);
-			Debugger.OnRemoveListener(id, processToRemove.Method.Name);
+				Debugger.OnRemoveListener(id, processToRemove.Method.Name);
+			}
+			else
+			{
+				Debugger.OnInvalidRemoveListener();
+			}
 		}
 
 		/// <summary>
@@ -76,6 +97,12 @@ namespace DeckAdam.ActionManager
 		/// </param>
 		public static void AddAction(long id, Action newAction)
 		{
+			if (newAction == null)
+			{
+				Debugger.OnAddingEmptyAction();
+				return;
+			}
+
 			IfKeyExistsDo(id, () => _eventListeners[id].AddListener(newAction), () =>
 			{
 				_eventListeners[id] = new Event();
@@ -93,7 +120,9 @@ namespace DeckAdam.ActionManager
 		/// </param>
 		public static void ClearListener(long id)
 		{
-			IfKeyExistsDo(id, () => _eventListeners[id].ClearListener());
+			IfKeyExistsDo(id,
+				() => _eventListeners[id].ClearListener(), 
+				() => Debugger.OnClearingNonExistingKey());
 			Debugger.OnClearListener(id);
 		}
 
@@ -105,7 +134,9 @@ namespace DeckAdam.ActionManager
 		/// </param>
 		public static void TriggerAction(long id)
 		{
-			IfKeyExistsDo(id, () => _eventListeners[id].ProcessDelegates());
+			IfKeyExistsDo(id, 
+				() => _eventListeners[id].ProcessDelegates(),
+				() => Debugger.OnTriggeringNonExistingEvent());
 			Debugger.OnTriggerAction(id);
 		}
 

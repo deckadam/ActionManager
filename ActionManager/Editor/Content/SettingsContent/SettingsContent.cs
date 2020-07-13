@@ -10,6 +10,7 @@ namespace DeckAdam.ActionManager.UIComponent.SettingsContent
 		private Dictionary<string, int> _labelTable = new Dictionary<string, int>();
 		private Dictionary<string, ColorFieldWithLabel> _colorPickers = new Dictionary<string, ColorFieldWithLabel>();
 		private Button _applyButton;
+		private Toggle _reportInvalidOperation;
 		private List<string> _keys;
 
 		internal SettingsContent()
@@ -26,12 +27,14 @@ namespace DeckAdam.ActionManager.UIComponent.SettingsContent
 				_colorPickers[val] = new ColorFieldWithLabel(val, Settings.CurrentSettings.data[GetIndex(val)].GetColor());
 			}
 
+			_reportInvalidOperation = new Toggle((val) => Settings.CurrentSettings.reportInvalidOperation = val);
 			_applyButton = new Button(Constants.Apply, Settings.SaveSettings);
 		}
 
 		internal sealed override void Display(EditorWindow editor)
 		{
 			DrawColorPickerWithLabel();
+			_reportInvalidOperation.DrawToggle(Constants.ReportInvalidOperation);
 			_applyButton.ProcessButton();
 		}
 

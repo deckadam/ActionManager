@@ -9,6 +9,7 @@ namespace DeckAdam.ActionManager
 		internal static Settings CurrentSettings;
 		public ActionTypeColorData[] data;
 		public int logRemoveIndex = 0;
+		public bool reportInvalidOperation = true;
 
 		static Settings()
 		{
