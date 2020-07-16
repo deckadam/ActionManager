@@ -11,7 +11,7 @@ namespace DeckAdam.ActionManager
 
 		internal Log(LogType type, string logData)
 		{
-			Time = UnityEngine.Time.time - ActionManager.InitializationTime;
+			Time = UnityEngine.Time.time - Core.ActionManager.InitializationTime;
 			LogData = logData;
 			Type = type;
 		}

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using DeckAdam.ActionManager.Core.Repo;
+using DeckAdam.ActionManager.Repo;
 using UnityEditor;
 using UnityEngine;
 
@@ -41,8 +41,12 @@ namespace DeckAdam.ActionManager.UIComponent.LogContent
 			_selectAllButton = new Button(Constants.SelectAll, () => SetAllKeys(true));
 			_deselectAllButton = new Button(Constants.DeselectAll, () => SetAllKeys(false));
 
-			_saveButton = new Button(Constants.SavetoFile, Save);
-			_loadButton = new Button(Constants.LoadFromFile, Load);
+			_saveButton = new Button(Constants.SavetoFile, () => Repository.SaveLogStatus(_logCondition));
+			_loadButton = new Button(Constants.LoadFromFile, () =>
+			{
+				Repository.LoadLogStatus();
+				Refresh();
+			});
 		}
 
 		internal sealed override void Display(EditorWindow editor)
@@ -103,20 +107,8 @@ namespace DeckAdam.ActionManager.UIComponent.LogContent
 			Refresh();
 		}
 
-		private void Save()
-		{
-			var allLogs = Repository.GetLogs();
-			var selectedLogs = allLogs.Where(log => _logCondition[log.Type.ToString()]).ToList();
-			LogFile.SaveLogFile(selectedLogs.ToArray());
-		}
-
 		private void Load()
 		{
-			var logs = LogFile.LoadLogFile().SavedLog;
-			foreach (var log in logs)
-			{
-				Repository.AddLog(log);
-			}
 			Refresh();
 		}
 	}

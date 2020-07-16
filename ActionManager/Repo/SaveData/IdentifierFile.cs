@@ -1,5 +1,5 @@
 ﻿using System;
-using DeckAdam.ActionManager.Core.Repo;
+using DeckAdam.ActionManager.Repo;
 
 namespace DeckAdam.ActionManager
 {
@@ -34,6 +34,21 @@ namespace DeckAdam.ActionManager
 		internal static void LoadIdentifierState()
 		{
 			identifierFile = JsonLoader.LoadData<IdentifierFile>(Constants.IdentifierFilePath);
+		}
+	}
+	
+	[Serializable]
+	internal class ActionIdentifier
+	{
+		public long id;
+		public string name;
+		public string[] connectedIdentifiers;
+
+		public ActionIdentifier(long id, string name, string[] connectedIdentifiers)
+		{
+			this.id = id;
+			this.connectedIdentifiers = connectedIdentifiers;
+			this.name = name;
 		}
 	}
 }

@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
-using DeckAdam.ActionManager.Core.Repo;
+using DeckAdam.ActionManager.Repo;
 using UnityEditor;
 using UnityEngine;
 
 namespace DeckAdam.ActionManager.UIComponent.IdentifierCountent
 {
-	internal class IdentifierContent :  Content
+	internal class IdentifierContent : Content
 	{
 		private ScrollableTextArea _actionScrollableTextArea;
 		private VerticalArea _verticalTagArea;

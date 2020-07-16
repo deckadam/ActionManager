@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using DeckAdam.ActionManager.Core.Repo;
+using DeckAdam.ActionManager.Repo;
 
 namespace DeckAdam.ActionManager
 {

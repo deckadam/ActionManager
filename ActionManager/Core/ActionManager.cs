@@ -1,16 +1,17 @@
 using System;
 using System.Collections.Generic;
-using DeckAdam.ActionManager.Core.Repo;
+using DeckAdam.ActionManager.Repo;
 using UnityEngine;
-using Event = DeckAdam.ActionManager.Core.Event;
 
-namespace DeckAdam.ActionManager
+namespace DeckAdam.ActionManager.Core
 {
 	public static class ActionManager
 	{
 		//TODO: Find out how to make attributes functional to use in debugger invokes
 		internal static float InitializationTime;
-		internal static bool isInitialized = false;
+
+		//Check for system initialization
+		private static bool _isInitialized;
 
 		// Dictionary for holding all events in order
 		private static Dictionary<long, Event> _eventListeners;
@@ -34,13 +35,13 @@ namespace DeckAdam.ActionManager
 		/// </param>
 		public static void Init(Type eventClass)
 		{
-			if (isInitialized)
+			if (_isInitialized)
 			{
 				Debugger.OnReinitialization();
 				return;
 			}
-
-			isInitialized = true;
+			Repository.InitializeRepository();
+			_isInitialized = true;
 			_eventListeners = new Dictionary<long, Event>();
 			InitializationTime = Time.time;
 			EventClass = eventClass;
@@ -53,9 +54,9 @@ namespace DeckAdam.ActionManager
 		/// </summary>
 		public static void ClearListeners()
 		{
-			if (!isInitialized)
+			if (!_isInitialized)
 			{
-				Debugger.OnInvalidClearListeners();
+				Debugger.OnNonInitializedOperation();
 				return;
 			}
 
@@ -75,6 +76,12 @@ namespace DeckAdam.ActionManager
 		/// </param>
 		public static void RemoveListener(long id, Action processToRemove)
 		{
+			if (!_isInitialized)
+			{
+				Debugger.OnNonInitializedOperation();
+				return;
+			}
+
 			if (_eventListeners.TryGetValue(id, out var temp))
 			{
 				temp.RemoveListener(processToRemove);
@@ -97,6 +104,12 @@ namespace DeckAdam.ActionManager
 		/// </param>
 		public static void AddAction(long id, Action newAction)
 		{
+			if (!_isInitialized)
+			{
+				Debugger.OnNonInitializedOperation();
+				return;
+			}
+
 			if (newAction == null)
 			{
 				Debugger.OnAddingEmptyAction();
@@ -120,8 +133,14 @@ namespace DeckAdam.ActionManager
 		/// </param>
 		public static void ClearListener(long id)
 		{
+			if (!_isInitialized)
+			{
+				Debugger.OnNonInitializedOperation();
+				return;
+			}
+
 			IfKeyExistsDo(id,
-				() => _eventListeners[id].ClearListener(), 
+				() => _eventListeners[id].ClearListener(),
 				() => Debugger.OnClearingNonExistingKey());
 			Debugger.OnClearListener(id);
 		}
@@ -134,7 +153,13 @@ namespace DeckAdam.ActionManager
 		/// </param>
 		public static void TriggerAction(long id)
 		{
-			IfKeyExistsDo(id, 
+			if (!_isInitialized)
+			{
+				Debugger.OnNonInitializedOperation();
+				return;
+			}
+
+			IfKeyExistsDo(id,
 				() => _eventListeners[id].ProcessDelegates(),
 				() => Debugger.OnTriggeringNonExistingEvent());
 			Debugger.OnTriggerAction(id);
@@ -145,19 +170,24 @@ namespace DeckAdam.ActionManager
 		/// </summary>
 		public static void SaveIdentifierStatus()
 		{
+			if (!Application.isEditor)
+			{
+				return;
+			}
+			
+			if (!_isInitialized)
+			{
+				Debugger.OnNonInitializedOperation();
+				return;
+			}
+			
 			Repository.SaveIdentifierStatus();
-		}
-
-		// Is key has been created or not
-		private static bool IsKeyContained(long id)
-		{
-			return _eventListeners.ContainsKey(id);
 		}
 
 		// For checking if the desired key has been assigned or not
 		private static void IfKeyExistsDo(long id, Action ifToDo, Action elseToDo = null)
 		{
-			(IsKeyContained(id) ? ifToDo : elseToDo)?.Invoke();
+			(_eventListeners.ContainsKey(id) ? ifToDo : elseToDo)?.Invoke();
 		}
 	}
 }

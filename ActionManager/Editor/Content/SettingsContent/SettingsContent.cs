@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
-using DeckAdam.ActionManager.Core.Repo;
-using DeckAdam.ActionManager.UIComponent;
+using DeckAdam.ActionManager.Repo;
 using UnityEditor;
 
 namespace DeckAdam.ActionManager.UIComponent.SettingsContent

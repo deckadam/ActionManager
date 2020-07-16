@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using DeckAdam.ActionManager;
+using DeckAdam.ActionManager.Core;
 using UnityEngine;
 
 public class ActionManagerExample : MonoBehaviour

@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using DeckAdam.ActionManager.Core.Repo;
+using DeckAdam.ActionManager.Repo;
 
 namespace DeckAdam.ActionManager
 {
@@ -12,7 +12,7 @@ namespace DeckAdam.ActionManager
 
 		private static void CreateNewLog(string log, LogType logType)
 		{
-			var result = Constants.NewLine + CollectStackTrace();
+			var result = Constants.NewLine + log + Constants.NewLine + CollectStackTrace();
 			Repository.AddLog(new Log(logType, result));
 			if (EditoreCore.Instance != null)
 			{

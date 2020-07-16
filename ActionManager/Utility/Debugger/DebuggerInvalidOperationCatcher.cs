@@ -12,7 +12,7 @@ namespace DeckAdam.ActionManager
 		}
 
 		[Conditional("UNITY_ASSERTIONS")]
-		internal static void OnInvalidClearListeners()
+		internal static void OnNonInitializedOperation()
 		{
 			if (!IsReportingOn) return;
 			CreateNewLog(Constants.OnNoninitalizedOperation, LogType.OnInvallidOperation);
